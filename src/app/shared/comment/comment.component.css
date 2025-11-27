@@ -1,0 +1,55 @@
+.comment {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.comment:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #e2e8f0;
+    flex-shrink: 0;
+}
+
+.comment-content {
+    flex: 1;
+}
+
+.comment-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.donation-badge {
+    background: #f1f5f9;
+    padding: 0.1rem 0.6rem;
+    border-radius: var(--radius-full);
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: var(--primary-color);
+}
+
+.time {
+    color: var(--light-text);
+    font-size: 0.85rem;
+    margin-left: auto;
+}
+
+.comment p {
+    margin-bottom: 0;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--dark-text);
+}

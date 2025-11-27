@@ -1,0 +1,62 @@
+<div class="modal-overlay" (click)="close()">
+    <div class="modal-container" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h2>Make a Donation</h2>
+            <button class="close-btn" (click)="close()">&times;</button>
+        </div>
+
+        <div class="modal-body">
+            <p class="campaign-title">Supporting: <strong>Emergency Medical Supplies</strong></p>
+
+            <div class="amount-selection">
+                <label>Select Amount</label>
+                <div class="amount-grid">
+                    <button class="amount-btn" [class.active]="selectedAmount === 10"
+                        (click)="selectAmount(10)">$10</button>
+                    <button class="amount-btn" [class.active]="selectedAmount === 25"
+                        (click)="selectAmount(25)">$25</button>
+                    <button class="amount-btn" [class.active]="selectedAmount === 50"
+                        (click)="selectAmount(50)">$50</button>
+                    <button class="amount-btn" [class.active]="selectedAmount === 100"
+                        (click)="selectAmount(100)">$100</button>
+                </div>
+                <div class="custom-amount">
+                    <span class="currency">$</span>
+                    <input type="number" placeholder="Custom Amount" [(ngModel)]="customAmount"
+                        (focus)="selectedAmount = 0">
+                </div>
+            </div>
+
+            <form class="payment-form">
+                <div class="form-group">
+                    <label>Card Information</label>
+                    <div class="card-input-container">
+                        <input type="text" placeholder="Card number" class="card-number">
+                        <div class="card-meta">
+                            <input type="text" placeholder="MM/YY" class="card-expiry">
+                            <input type="text" placeholder="CVC" class="card-cvc">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Name on Card</label>
+                    <input type="text" placeholder="Full Name">
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="anonymous">
+                    <label for="anonymous">Donate anonymously</label>
+                </div>
+            </form>
+        </div>
+
+        <div class="modal-footer">
+            <div class="total">
+                <span>Total Donation</span>
+                <span class="amount">{{ getDisplayAmount() | currency }}</span>
+            </div>
+            <button class="btn btn-primary btn-block btn-lg">Complete Donation</button>
+        </div>
+    </div>
+</div>

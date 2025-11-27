@@ -1,0 +1,214 @@
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    display: flex;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.close-btn {
+    font-size: 2rem;
+    line-height: 1;
+    color: var(--light-text);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+.close-btn:hover {
+    color: var(--dark-text);
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.campaign-title {
+    margin-bottom: 1.5rem;
+    color: var(--light-text);
+}
+
+.campaign-title strong {
+    color: var(--dark-text);
+}
+
+.amount-selection {
+    margin-bottom: 2rem;
+}
+
+.amount-selection label,
+.payment-form label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+}
+
+.amount-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.amount-btn {
+    padding: 0.75rem 0;
+    border: 1px solid #e2e8f0;
+    border-radius: var(--radius-md);
+    background: white;
+    font-weight: 600;
+    color: var(--dark-text);
+    transition: all 0.2s;
+}
+
+.amount-btn:hover,
+.amount-btn.active {
+    border-color: var(--primary-color);
+    background: #f0fdf4;
+    color: var(--primary-color);
+}
+
+.custom-amount {
+    position: relative;
+}
+
+.currency {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--light-text);
+    font-weight: 600;
+}
+
+.custom-amount input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2rem;
+    border: 1px solid #e2e8f0;
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.custom-amount input:focus {
+    border-color: var(--primary-color);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.card-input-container {
+    border: 1px solid #e2e8f0;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.card-number {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: none;
+    border-bottom: 1px solid #e2e8f0;
+    outline: none;
+}
+
+.card-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.card-expiry,
+.card-cvc {
+    padding: 0.75rem 1rem;
+    border: none;
+    outline: none;
+}
+
+.card-expiry {
+    border-right: 1px solid #e2e8f0;
+}
+
+.form-group input:not(.card-number):not(.card-expiry):not(.card-cvc) {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.form-group input:not(.card-number):not(.card-expiry):not(.card-cvc):focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 166, 81, 0.1);
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.modal-footer {
+    padding: 1.5rem;
+    background: var(--off-white);
+    border-top: 1px solid #f1f5f9;
+}
+
+.total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.total .amount {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+}
+
+.btn-block {
+    width: 100%;
+}
+
+.btn-lg {
+    padding: 1rem;
+    font-size: 1.1rem;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}

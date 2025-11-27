@@ -1,0 +1,97 @@
+<div class="details-container">
+    <div class="container">
+        <div class="details-grid">
+            <!-- Left Column: Content -->
+            <div class="main-content">
+                <div class="campaign-image">
+                    <div class="image-placeholder">🏥</div>
+                </div>
+
+                <div class="campaign-header">
+                    <span class="category-badge">Medical Aid</span>
+                    <h1>Emergency Medical Supplies for Gaza Hospitals</h1>
+                    <div class="campaign-meta">
+                        <div class="organizer">
+                            <div class="avatar"></div>
+                            <span>Organized by <strong>Dr. Sarah Smith</strong></span>
+                        </div>
+                        <span class="date">Created 2 days ago</span>
+                        <span class="location">📍 Gaza Strip</span>
+                    </div>
+                </div>
+
+                <div class="tabs">
+                    <button class="tab-btn active">About</button>
+                    <button class="tab-btn">Updates (3)</button>
+                    <button class="tab-btn">Comments</button>
+                </div>
+
+                <div class="content-body">
+                    <p>Hospitals in Gaza are facing critical shortages of essential medicines, surgical supplies, and
+                        fuel. This campaign aims to provide immediate relief by delivering:</p>
+                    <ul>
+                        <li>Anesthesia and surgical kits</li>
+                        <li>Antibiotics and painkillers</li>
+                        <li>Emergency trauma supplies</li>
+                        <li>Fuel for hospital generators</li>
+                    </ul>
+                    <p>Every donation, no matter how small, helps save lives. We are working directly with local
+                        partners to ensure aid reaches those who need it most effectively and transparently.</p>
+
+                    <h3>Comments</h3>
+                    <div class="comments-section">
+                        <div class="comment" *ngFor="let i of [1,2,3]">
+                            <div class="avatar"></div>
+                            <div class="comment-content">
+                                <div class="comment-header">
+                                    <strong>Anonymous Donor</strong>
+                                    <span class="donation-badge">$50</span>
+                                    <span class="time">2 hours ago</span>
+                                </div>
+                                <p>Praying for everyone's safety. Keep up the great work.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Donation Card -->
+            <div class="sidebar">
+                <div class="donation-card">
+                    <div class="progress-section">
+                        <div class="amount-display">
+                            <span class="current">$75,000</span>
+                            <span class="target">raised of $100,000 goal</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 75%"></div>
+                        </div>
+                        <div class="donor-count">
+                            <strong>1,234</strong> donations
+                        </div>
+                    </div>
+
+                    <div class="donation-actions">
+                        <button class="btn btn-primary btn-lg btn-block" (click)="openDonationModal()">Donate
+                            Now</button>
+                        <button class="btn btn-outline btn-lg btn-block">Share Campaign</button>
+                    </div>
+
+                    <div class="recent-donations">
+                        <h4>Recent Donations</h4>
+                        <div class="mini-donation" *ngFor="let i of [1,2,3]">
+                            <div class="icon">💚</div>
+                            <div class="info">
+                                <strong>$100</strong>
+                                <span>Anonymous</span>
+                            </div>
+                            <span class="time">5m</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <app-donation-modal *ngIf="isDonationModalOpen" (closeModal)="closeDonationModal()"></app-donation-modal>
+</div>
