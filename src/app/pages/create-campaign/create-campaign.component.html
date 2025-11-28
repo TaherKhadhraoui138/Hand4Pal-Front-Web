@@ -1,0 +1,179 @@
+<div class="create-campaign-container">
+    <div class="container">
+        <div class="page-header">
+            <div class="header-content">
+                <h1>Create New Campaign</h1>
+                <p>Launch a new fundraising campaign to support your cause</p>
+            </div>
+            <a href="/association-dashboard" class="btn btn-outline">← Back to Dashboard</a>
+        </div>
+
+        <div class="form-layout">
+            <!-- Main Form -->
+            <div class="form-section">
+                <form class="campaign-form">
+                    <div class="section-card">
+                        <h2>Campaign Details</h2>
+
+                        <div class="form-group">
+                            <label>Campaign Title <span class="required">*</span></label>
+                            <input type="text" placeholder="e.g., Emergency Medical Aid for Gaza" required>
+                            <span class="helper-text">Choose a clear and compelling title</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Category <span class="required">*</span></label>
+                            <select required>
+                                <option value="">Select a category</option>
+                                <option>Emergency Relief</option>
+                                <option>Medical Aid</option>
+                                <option>Education</option>
+                                <option>Clean Water</option>
+                                <option>Food Security</option>
+                                <option>Infrastructure</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Funding Goal <span class="required">*</span></label>
+                                <div class="input-with-prefix">
+                                    <span class="input-prefix">$</span>
+                                    <input type="number" placeholder="10000" min="100" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>End Date <span class="required">*</span></label>
+                                <input type="date" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Short Description <span class="required">*</span></label>
+                            <textarea rows="3" placeholder="Brief summary of your campaign (max 200 characters)"
+                                maxlength="200" required></textarea>
+                            <span class="helper-text">This will appear in campaign listings</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Full Description <span class="required">*</span></label>
+                            <textarea rows="8"
+                                placeholder="Provide detailed information about your campaign, including goals, impact, and how funds will be used..."
+                                required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Campaign Image <span class="required">*</span></label>
+                            <div class="file-upload">
+                                <input type="file" id="campaign-image" accept="image/*">
+                                <label for="campaign-image" class="file-upload-label">
+                                    <span class="upload-icon">📷</span>
+                                    <span>Click to upload or drag and drop</span>
+                                    <span class="upload-hint">PNG, JPG up to 5MB</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-card">
+                        <h2>Additional Information</h2>
+
+                        <div class="form-group">
+                            <label>Location/Region</label>
+                            <input type="text" placeholder="e.g., Gaza, West Bank, Jerusalem">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Beneficiaries</label>
+                            <input type="text" placeholder="Who will benefit from this campaign?">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Video URL (Optional)</label>
+                            <input type="url" placeholder="https://youtube.com/watch?v=...">
+                            <span class="helper-text">Add a YouTube or Vimeo video to increase engagement</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Tags</label>
+                            <input type="text" placeholder="e.g., emergency, medical, children (comma separated)">
+                            <span class="helper-text">Help people discover your campaign</span>
+                        </div>
+                    </div>
+
+                    <div class="section-card">
+                        <h2>Terms & Conditions</h2>
+
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" required>
+                                <span>I confirm that all information provided is accurate and truthful</span>
+                            </label>
+                        </div>
+
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" required>
+                                <span>I agree to provide regular updates on campaign progress</span>
+                            </label>
+                        </div>
+
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" required>
+                                <span>I understand that funds will be disbursed according to platform policies</span>
+                            </label>
+                        </div>
+
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" required>
+                                <span>I agree to the <a href="#" class="link">Terms of Service</a> and <a href="#"
+                                        class="link">Privacy Policy</a></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-outline">Save as Draft</button>
+                        <button type="submit" class="btn btn-primary">Submit for Review</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Sidebar Tips -->
+            <aside class="tips-sidebar">
+                <div class="tip-card">
+                    <h3>💡 Tips for Success</h3>
+                    <ul class="tips-list">
+                        <li>Use a clear, high-quality image that represents your cause</li>
+                        <li>Be specific about how funds will be used</li>
+                        <li>Set a realistic funding goal</li>
+                        <li>Tell a compelling story with emotional appeal</li>
+                        <li>Include data and statistics when possible</li>
+                        <li>Update supporters regularly</li>
+                    </ul>
+                </div>
+
+                <div class="tip-card">
+                    <h3>📋 Campaign Checklist</h3>
+                    <ul class="checklist">
+                        <li>✓ Compelling title</li>
+                        <li>✓ Clear funding goal</li>
+                        <li>✓ Detailed description</li>
+                        <li>✓ High-quality image</li>
+                        <li>✓ Realistic timeline</li>
+                        <li>✓ Regular updates plan</li>
+                    </ul>
+                </div>
+
+                <div class="tip-card warning-card">
+                    <h3>⚠️ Important</h3>
+                    <p>Your campaign will be reviewed by our team before going live. This typically takes 1-2 business
+                        days.</p>
+                </div>
+            </aside>
+        </div>
+    </div>
+</div>
