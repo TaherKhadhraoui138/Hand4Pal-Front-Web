@@ -40,17 +40,10 @@
 
                     <h3>Comments</h3>
                     <div class="comments-section">
-                        <div class="comment" *ngFor="let i of [1,2,3]">
-                            <div class="avatar"></div>
-                            <div class="comment-content">
-                                <div class="comment-header">
-                                    <strong>Anonymous Donor</strong>
-                                    <span class="donation-badge">$50</span>
-                                    <span class="time">2 hours ago</span>
-                                </div>
-                                <p>Praying for everyone's safety. Keep up the great work.</p>
-                            </div>
-                        </div>
+                        <app-comment *ngFor="let i of [1,2,3]" author="Anonymous Donor"
+                            content="Praying for everyone's safety. Keep up the great work." timeAgo="2 hours ago"
+                            [donationAmount]="50">
+                        </app-comment>
                     </div>
                 </div>
             </div>
@@ -79,14 +72,8 @@
 
                     <div class="recent-donations">
                         <h4>Recent Donations</h4>
-                        <div class="mini-donation" *ngFor="let i of [1,2,3]">
-                            <div class="icon">💚</div>
-                            <div class="info">
-                                <strong>$100</strong>
-                                <span>Anonymous</span>
-                            </div>
-                            <span class="time">5m</span>
-                        </div>
+                        <app-comment *ngFor="let i of [1,2,3]" author="Anonymous" timeAgo="5m" [donationAmount]="100">
+                        </app-comment>
                     </div>
                 </div>
             </div>

@@ -6,24 +6,26 @@
         </div>
 
         <div class="modal-body">
-            <p class="campaign-title">Supporting: <strong>Emergency Medical Supplies</strong></p>
+            <div class="donation-details">
+                <p class="campaign-title">Supporting: <strong>Emergency Medical Supplies</strong></p>
 
-            <div class="amount-selection">
-                <label>Select Amount</label>
-                <div class="amount-grid">
-                    <button class="amount-btn" [class.active]="selectedAmount === 10"
-                        (click)="selectAmount(10)">$10</button>
-                    <button class="amount-btn" [class.active]="selectedAmount === 25"
-                        (click)="selectAmount(25)">$25</button>
-                    <button class="amount-btn" [class.active]="selectedAmount === 50"
-                        (click)="selectAmount(50)">$50</button>
-                    <button class="amount-btn" [class.active]="selectedAmount === 100"
-                        (click)="selectAmount(100)">$100</button>
-                </div>
-                <div class="custom-amount">
-                    <span class="currency">$</span>
-                    <input type="number" placeholder="Custom Amount" [(ngModel)]="customAmount"
-                        (focus)="selectedAmount = 0">
+                <div class="amount-selection">
+                    <label>Select Amount</label>
+                    <div class="amount-grid">
+                        <button class="amount-btn" [class.active]="selectedAmount === 10"
+                            (click)="selectAmount(10)">$10</button>
+                        <button class="amount-btn" [class.active]="selectedAmount === 25"
+                            (click)="selectAmount(25)">$25</button>
+                        <button class="amount-btn" [class.active]="selectedAmount === 50"
+                            (click)="selectAmount(50)">$50</button>
+                        <button class="amount-btn" [class.active]="selectedAmount === 100"
+                            (click)="selectAmount(100)">$100</button>
+                    </div>
+                    <div class="custom-amount">
+                        <span class="currency">$</span>
+                        <input type="number" placeholder="Custom Amount" [(ngModel)]="customAmount"
+                            (focus)="selectedAmount = 0">
+                    </div>
                 </div>
             </div>
 
