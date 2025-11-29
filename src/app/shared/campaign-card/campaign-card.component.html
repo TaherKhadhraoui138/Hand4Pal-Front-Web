@@ -1,0 +1,53 @@
+<div class="campaign-card">
+    <a [routerLink]="['/campaigns', campaign.id]" class="card-link">
+        <div class="card-image">
+            <div class="category-tag">{{ categoryName }}</div>
+            <img 
+                *ngIf="campaign.imageUrl" 
+                [src]="campaign.imageUrl" 
+                [alt]="campaign.title"
+                class="campaign-image"
+            />
+            <div *ngIf="!campaign.imageUrl" class="image-placeholder">
+                {{ categoryEmoji }}
+            </div>
+        </div>
+        
+        <div class="card-content">
+            <h3 class="card-title">{{ campaign.title }}</h3>
+            <p class="description">{{ campaign.description }}</p>
+
+            <div class="progress-section">
+                <div class="progress-bar">
+                    <div 
+                        class="progress-fill" 
+                        [style.width.%]="progressPercentage"
+                    ></div>
+                </div>
+                <div class="progress-stats">
+                    <span class="raised">{{ formattedRaisedAmount }} raised</span>
+                    <span class="goal">of {{ formattedGoalAmount }}</span>
+                </div>
+            </div>
+
+            <div class="card-footer">
+                <div class="organizer">
+                    <div class="avatar">
+                        <img 
+                            *ngIf="campaign.organizerAvatar" 
+                            [src]="campaign.organizerAvatar" 
+                            [alt]="campaign.organizerName"
+                        />
+                    </div>
+                    <span>By {{ campaign.organizerName }}</span>
+                </div>
+                <button 
+                    class="btn btn-primary btn-sm" 
+                    (click)="onDonateClick($event)"
+                >
+                    Donate Now
+                </button>
+            </div>
+        </div>
+    </a>
+</div>

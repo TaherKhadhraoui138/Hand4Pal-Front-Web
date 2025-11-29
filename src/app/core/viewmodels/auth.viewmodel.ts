@@ -42,6 +42,7 @@ export class AuthViewModel {
 
     /**
      * Enregistrer un citoyen
+     * Redirige vers la page de connexion après inscription
      */
     async registerCitizen(data: RegisterCitizenRequest): Promise<boolean> {
         this.setLoading(true);
@@ -51,13 +52,13 @@ export class AuthViewModel {
             console.log('Tentative d\'inscription citoyen avec:', data);
             await this.authService.registerCitizen(data).toPromise();
             console.log('Inscription réussie');
-            this.setSuccess('Votre compte a été créé avec succès !');
+            this.setSuccess('Your account has been created successfully! Please log in.');
             this.setLoading(false);
 
-            // Rediriger vers le tableau de bord ou la page d'accueil
+            // Rediriger vers la page de connexion
             setTimeout(() => {
-                this.router.navigate(['/']);
-            }, 1500);
+                this.router.navigate(['/login']);
+            }, 2000);
 
             return true;
         } catch (error: any) {
@@ -70,6 +71,7 @@ export class AuthViewModel {
 
     /**
      * Enregistrer une association
+     * Affiche un message d'attente d'approbation et redirige vers la page d'accueil
      */
     async registerAssociation(data: RegisterAssociationRequest): Promise<boolean> {
         this.setLoading(true);
@@ -77,13 +79,13 @@ export class AuthViewModel {
 
         try {
             await this.authService.registerAssociation(data).toPromise();
-            this.setSuccess('Votre compte a été créé avec succès !');
+            this.setSuccess('Your request has been submitted successfully! Please wait for admin approval.');
             this.setLoading(false);
 
-            // Rediriger vers le tableau de bord association
+            // Rediriger vers la page d'accueil après un délai plus long pour lire le message
             setTimeout(() => {
-                this.router.navigate(['/association-dashboard']);
-            }, 1500);
+                this.router.navigate(['/']);
+            }, 3000);
 
             return true;
         } catch (error: any) {

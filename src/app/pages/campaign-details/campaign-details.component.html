@@ -1,49 +1,102 @@
-<div class="details-container">
+<!-- Loading state -->
+<div *ngIf="isLoading" class="loading-container">
+    <div class="loading-spinner"></div>
+    <p>Loading campaign...</p>
+</div>
+
+<!-- Campaign details -->
+<div *ngIf="!isLoading && campaign" class="details-container">
     <div class="container">
         <div class="details-grid">
             <!-- Left Column: Content -->
             <div class="main-content">
                 <div class="campaign-image">
-                    <div class="image-placeholder">🏥</div>
+                    <img 
+                        *ngIf="campaign.imageUrl" 
+                        [src]="campaign.imageUrl" 
+                        [alt]="campaign.title"
+                        class="campaign-img"
+                    />
+                    <div *ngIf="!campaign.imageUrl" class="image-placeholder">{{ categoryEmoji }}</div>
                 </div>
 
                 <div class="campaign-header">
-                    <span class="category-badge">Medical Aid</span>
-                    <h1>Emergency Medical Supplies for Gaza Hospitals</h1>
+                    <span class="category-badge">{{ categoryName }}</span>
+                    <h1>{{ campaign.title }}</h1>
                     <div class="campaign-meta">
                         <div class="organizer">
-                            <div class="avatar"></div>
-                            <span>Organized by <strong>Dr. Sarah Smith</strong></span>
+                            <div class="avatar">
+                                <img 
+                                    *ngIf="campaign.organizerAvatar" 
+                                    [src]="campaign.organizerAvatar" 
+                                    [alt]="campaign.organizerName"
+                                />
+                            </div>
+                            <span>Organized by <strong>{{ campaign.organizerName }}</strong></span>
                         </div>
-                        <span class="date">Created 2 days ago</span>
-                        <span class="location">📍 Gaza Strip</span>
+                        <span class="date">{{ getRelativeTime(campaign.createdAt) }}</span>
                     </div>
                 </div>
 
                 <div class="tabs">
-                    <button class="tab-btn active">About</button>
-                    <button class="tab-btn">Updates (3)</button>
-                    <button class="tab-btn">Comments</button>
+                    <button 
+                        class="tab-btn" 
+                        [class.active]="activeTab === 'about'"
+                        (click)="setActiveTab('about')"
+                    >About</button>
+                    <button 
+                        class="tab-btn"
+                        [class.active]="activeTab === 'updates'"
+                        (click)="setActiveTab('updates')"
+                    >Updates (3)</button>
+                    <button 
+                        class="tab-btn"
+                        [class.active]="activeTab === 'comments'"
+                        (click)="setActiveTab('comments')"
+                    >Comments</button>
                 </div>
 
                 <div class="content-body">
-                    <p>Hospitals in Gaza are facing critical shortages of essential medicines, surgical supplies, and
-                        fuel. This campaign aims to provide immediate relief by delivering:</p>
-                    <ul>
-                        <li>Anesthesia and surgical kits</li>
-                        <li>Antibiotics and painkillers</li>
-                        <li>Emergency trauma supplies</li>
-                        <li>Fuel for hospital generators</li>
-                    </ul>
-                    <p>Every donation, no matter how small, helps save lives. We are working directly with local
-                        partners to ensure aid reaches those who need it most effectively and transparently.</p>
+                    <!-- About Tab -->
+                    <div *ngIf="activeTab === 'about'">
+                        <p>{{ campaign.description }}</p>
 
-                    <h3>Comments</h3>
-                    <div class="comments-section">
-                        <app-comment *ngFor="let i of [1,2,3]" author="Anonymous Donor"
-                            content="Praying for everyone's safety. Keep up the great work." timeAgo="2 hours ago"
-                            [donationAmount]="50">
-                        </app-comment>
+                        <h3>Comments</h3>
+                        <div class="comments-section">
+                            <app-comment *ngFor="let i of [1,2,3]" author="Anonymous Donor"
+                                content="Praying for everyone's safety. Keep up the great work." timeAgo="2 hours ago"
+                                [donationAmount]="50">
+                            </app-comment>
+                        </div>
+                    </div>
+
+                    <!-- Updates Tab -->
+                    <div *ngIf="activeTab === 'updates'">
+                        <div class="update-item">
+                            <h4>Week 3 Progress Report</h4>
+                            <p class="update-date">Posted 3 days ago</p>
+                            <p>We have successfully distributed supplies to 5 hospitals. Thank you for your continued support!</p>
+                        </div>
+                        <div class="update-item">
+                            <h4>First Shipment Arrived</h4>
+                            <p class="update-date">Posted 1 week ago</p>
+                            <p>Our first shipment of medical supplies has arrived and is being distributed to hospitals in need.</p>
+                        </div>
+                        <div class="update-item">
+                            <h4>Campaign Launched</h4>
+                            <p class="update-date">Posted 2 weeks ago</p>
+                            <p>Thank you for supporting our campaign! We are working hard to reach our goal.</p>
+                        </div>
+                    </div>
+
+                    <!-- Comments Tab -->
+                    <div *ngIf="activeTab === 'comments'">
+                        <div class="comments-section">
+                            <app-comment *ngFor="let i of [1,2,3,4,5]" author="Anonymous Donor"
+                                content="Praying for everyone's safety. Keep up the great work." timeAgo="2 hours ago"
+                                [donationAmount]="50">
+                            </app-comment>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -53,32 +106,38 @@
                 <div class="donation-card">
                     <div class="progress-section">
                         <div class="amount-display">
-                            <span class="current">$75,000</span>
-                            <span class="target">raised of $100,000 goal</span>
+                            <span class="current">{{ formatCurrency(campaign.raisedAmount) }}</span>
+                            <span class="target">raised of {{ formatCurrency(campaign.goalAmount) }} goal</span>
                         </div>
                         <div class="progress-bar">
-                            <div class="progress-fill" style="width: 75%"></div>
+                            <div class="progress-fill" [style.width.%]="progressPercentage"></div>
                         </div>
                         <div class="donor-count">
-                            <strong>1,234</strong> donations
+                            <strong>{{ progressPercentage | number:'1.0-0' }}%</strong> funded
                         </div>
                     </div>
 
                     <div class="donation-actions">
-                        <button class="btn btn-primary btn-lg btn-block" (click)="openDonationModal()">Donate
-                            Now</button>
+                        <button class="btn btn-primary btn-lg btn-block" (click)="openDonationModal()">
+                            Donate Now
+                        </button>
                         <button class="btn btn-outline btn-lg btn-block">Share Campaign</button>
                     </div>
 
                     <div class="recent-donations">
                         <h4>Recent Donations</h4>
-                        <app-comment *ngFor="let i of [1,2,3]" author="Anonymous" timeAgo="5m" [donationAmount]="100">
-                        </app-comment>
+                        <app-comment author="Anonymous" timeAgo="5m" [donationAmount]="100"></app-comment>
+                        <app-comment author="John D." timeAgo="15m" [donationAmount]="50"></app-comment>
+                        <app-comment author="Sarah M." timeAgo="1h" [donationAmount]="200"></app-comment>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <app-donation-modal *ngIf="isDonationModalOpen" (closeModal)="closeDonationModal()"></app-donation-modal>
+    <app-donation-modal 
+        *ngIf="isDonationModalOpen" 
+        [campaignTitle]="campaign.title"
+        (closeModal)="closeDonationModal()">
+    </app-donation-modal>
 </div>

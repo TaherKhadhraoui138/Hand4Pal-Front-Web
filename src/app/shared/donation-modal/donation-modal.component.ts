@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -10,6 +10,7 @@ import { FormsModule } from '@angular/forms';
     styleUrls: ['./donation-modal.component.css']
 })
 export class DonationModalComponent {
+    @Input() campaignTitle: string = 'This Campaign';
     @Output() closeModal = new EventEmitter<void>();
 
     selectedAmount: number = 50;

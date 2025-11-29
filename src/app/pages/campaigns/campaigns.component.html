@@ -7,44 +7,28 @@
 
 <div class="container campaigns-container">
     <div class="filters">
-        <button class="filter-btn active">All</button>
-        <button class="filter-btn">Medical Aid</button>
-        <button class="filter-btn">Food & Water</button>
-        <button class="filter-btn">Education</button>
-        <button class="filter-btn">Reconstruction</button>
+        <button 
+            *ngFor="let filter of filters"
+            class="filter-btn"
+            [class.active]="activeFilter === filter.value"
+            (click)="filterByCategory(filter.value)"
+        >
+            {{ filter.label }}
+        </button>
     </div>
 
     <div class="campaigns-grid">
-        <!-- Campaign Card 1 -->
-        <div class="campaign-card" *ngFor="let i of [1,2,3,4,5,6]">
-            <div class="card-image">
-                <div class="category-tag">Medical Aid</div>
-                <!-- Placeholder -->
-                <div class="image-placeholder">🏥</div>
-            </div>
-            <div class="card-content">
-                <h3>Emergency Medical Supplies for Gaza Hospitals</h3>
-                <p class="description">Help us provide critical medical supplies, medicines, and equipment to hospitals
-                    in need.</p>
+        <app-campaign-card
+            *ngFor="let campaign of filteredCampaigns"
+            [campaign]="campaign"
+            (donate)="onDonate($event)"
+        ></app-campaign-card>
+    </div>
 
-                <div class="progress-section">
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 75%"></div>
-                    </div>
-                    <div class="progress-stats">
-                        <span class="raised">$75,000 raised</span>
-                        <span class="goal">of $100,000</span>
-                    </div>
-                </div>
-
-                <div class="card-footer">
-                    <div class="organizer">
-                        <div class="avatar"></div>
-                        <span>By Dr. Sarah Smith</span>
-                    </div>
-                    <a [routerLink]="['/campaigns', i]" class="btn btn-primary btn-sm">Donate Now</a>
-                </div>
-            </div>
-        </div>
+    <!-- Empty state -->
+    <div *ngIf="filteredCampaigns.length === 0" class="empty-state">
+        <div class="empty-icon">📭</div>
+        <h3>No campaigns found</h3>
+        <p>There are no campaigns in this category at the moment.</p>
     </div>
 </div>
