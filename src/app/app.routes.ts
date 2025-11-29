@@ -9,6 +9,7 @@ import { AdminDashboardComponent } from './pages/admin-dashboard/admin-dashboard
 import { AssociationProfile } from './pages/association-profile/association-profile.component';
 import { AssociationDashboard } from './pages/association-dashboard/association-dashboard.component';
 import { CreateCampaign } from './pages/create-campaign/create-campaign.component';
+import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
     { path: '', component: HomeComponent },
@@ -16,10 +17,36 @@ export const routes: Routes = [
     { path: 'register', component: RegisterComponent },
     { path: 'campaigns', component: CampaignsComponent },
     { path: 'campaigns/:id', component: CampaignDetailsComponent },
-    { path: 'profile', component: UserProfileComponent },
-    { path: 'admin', component: AdminDashboardComponent },
-    { path: 'association-profile', component: AssociationProfile },
-    { path: 'association-dashboard', component: AssociationDashboard },
-    { path: 'create-campaign', component: CreateCampaign },
+
+    // Routes protégées - nécessitent authentification
+    {
+        path: 'profile',
+        component: UserProfileComponent,
+        canActivate: [authGuard]
+    },
+    {
+        path: 'admin',
+        component: AdminDashboardComponent,
+        canActivate: [authGuard],
+        data: { role: 'ADMINISTRATOR' }
+    },
+    {
+        path: 'association-profile',
+        component: AssociationProfile,
+        canActivate: [authGuard],
+        data: { role: 'ASSOCIATION' }
+    },
+    {
+        path: 'association-dashboard',
+        component: AssociationDashboard,
+        canActivate: [authGuard],
+        data: { role: 'ASSOCIATION' }
+    },
+    {
+        path: 'create-campaign',
+        component: CreateCampaign,
+        canActivate: [authGuard],
+        data: { role: 'ASSOCIATION' }
+    },
     { path: '**', redirectTo: '' }
 ];

@@ -7,8 +7,29 @@
         <div class="nav-links">
             <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
             <a routerLink="/campaigns" routerLinkActive="active">Campaigns</a>
-            <a routerLink="/login" class="btn btn-outline btn-sm">Login</a>
-            <a routerLink="/register" class="btn btn-primary btn-sm">Start Fundraising</a>
+
+            <!-- Dashboard link for Admin -->
+            <a *ngIf="isAdmin$ | async" routerLink="/admin" routerLinkActive="active">Dashboard</a>
+
+            <!-- Dashboard link for Association -->
+            <a *ngIf="isAssociation$ | async" routerLink="/association-dashboard"
+                routerLinkActive="active">Dashboard</a>
+
+            <!-- Afficher si NON connecté -->
+            <ng-container *ngIf="!(isAuthenticated$ | async)">
+                <a routerLink="/login" class="btn btn-outline btn-sm">Login</a>
+                <a routerLink="/register" class="btn btn-primary btn-sm">Start Fundraising</a>
+            </ng-container>
+
+            <!-- Afficher si connecté -->
+            <ng-container *ngIf="isAuthenticated$ | async">
+                <!-- Profile link for Association users -->
+                <a *ngIf="isAssociation$ | async" routerLink="/association-profile"
+                    class="btn btn-outline btn-sm">Profile</a>
+                <!-- Profile link for other users (Citizen, Admin) -->
+                <a *ngIf="!(isAssociation$ | async)" routerLink="/profile" class="btn btn-outline btn-sm">Profile</a>
+                <button (click)="logout()" class="btn btn-primary btn-sm">Logout</button>
+            </ng-container>
         </div>
     </div>
 </nav>
