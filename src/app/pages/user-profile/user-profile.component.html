@@ -8,56 +8,103 @@
         <div class="profile-grid">
             <!-- Sidebar Navigation -->
             <div class="profile-sidebar">
-                <div class="user-brief">
-                    <div class="avatar-lg">JD</div>
+                <div class="user-brief" *ngIf="currentUser">
+                    <div class="avatar-lg">{{ currentUser.firstName?.charAt(0) }}{{ currentUser.lastName?.charAt(0) }}
+                    </div>
                     <div class="user-info">
-                        <h3>John Doe</h3>
-                        <span>Member since 2024</span>
+                        <h3>{{ currentUser.firstName }} {{ currentUser.lastName }}</h3>
+                        <span>Member since {{ currentUser.createdAt | date:'yyyy' }}</span>
                     </div>
                 </div>
 
                 <nav class="profile-nav">
-                    <a href="#" class="nav-item active">Personal Info</a>
-                    <a href="#" class="nav-item">My Donations</a>
-                    <a href="#" class="nav-item">Security</a>
-                    <a href="#" class="nav-item text-danger">Sign Out</a>
+                    <a href="javascript:void(0)" class="nav-item" [class.active]="activeTab === 'personal'"
+                        (click)="setActiveTab('personal')">Personal Info</a>
+                    <a href="javascript:void(0)" class="nav-item" [class.active]="activeTab === 'security'"
+                        (click)="setActiveTab('security')">Security</a>
+                    <a href="javascript:void(0)" class="nav-item text-danger" (click)="logout()">Sign Out</a>
                 </nav>
             </div>
 
             <!-- Main Content -->
             <div class="profile-content">
-                <div class="card">
+                <!-- Alerts -->
+                <div *ngIf="successMessage" class="alert alert-success">
+                    {{ successMessage }}
+                </div>
+                <div *ngIf="errorMessage" class="alert alert-danger">
+                    {{ errorMessage }}
+                </div>
+
+                <!-- Personal Info Tab -->
+                <div class="card" *ngIf="activeTab === 'personal'">
                     <div class="card-header">
                         <h2>Personal Information</h2>
                     </div>
 
-                    <form class="profile-form">
+                    <form [formGroup]="profileForm" (ngSubmit)="onUpdateProfile()" class="profile-form">
                         <div class="form-row">
                             <div class="form-group">
                                 <label>First Name</label>
-                                <input type="text" value="John">
+                                <input type="text" formControlName="firstName">
                             </div>
                             <div class="form-group">
                                 <label>Last Name</label>
-                                <input type="text" value="Doe">
+                                <input type="text" formControlName="lastName">
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label>Email Address</label>
-                            <input type="email" value="john.doe@example.com">
+                            <input type="email" formControlName="email">
                         </div>
 
                         <div class="form-group">
-                            <label>Bio</label>
-                            <textarea rows="4" placeholder="Tell us about yourself..."></textarea>
+                            <label>Phone</label>
+                            <input type="text" formControlName="phone">
                         </div>
 
                         <div class="form-actions">
-                            <button type="submit" class="btn btn-primary">Save Changes</button>
-                            <button type="button" class="btn btn-outline">Cancel</button>
+                            <button type="submit" class="btn btn-primary" [disabled]="isLoading">Save Changes</button>
                         </div>
                     </form>
+                </div>
+
+                <!-- Security Tab -->
+                <div class="card" *ngIf="activeTab === 'security'">
+                    <div class="card-header">
+                        <h2>Security Settings</h2>
+                    </div>
+
+                    <form [formGroup]="passwordForm" (ngSubmit)="onChangePassword()" class="profile-form">
+                        <div class="form-group">
+                            <label>Current Password</label>
+                            <input type="password" formControlName="currentPassword">
+                        </div>
+
+                        <div class="form-group">
+                            <label>New Password</label>
+                            <input type="password" formControlName="newPassword">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Confirm New Password</label>
+                            <input type="password" formControlName="confirmPassword">
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary" [disabled]="isLoading">Change
+                                Password</button>
+                        </div>
+                    </form>
+
+                    <div class="card-header mt-4">
+                        <h2 class="text-danger">Danger Zone</h2>
+                    </div>
+                    <div class="p-4">
+                        <p>Once you delete your account, there is no going back. Please be certain.</p>
+                        <button type="button" class="btn btn-danger" (click)="onDeleteAccount()">Delete Account</button>
+                    </div>
                 </div>
             </div>
         </div>

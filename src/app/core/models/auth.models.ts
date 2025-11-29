@@ -11,11 +11,15 @@ export interface RegisterCitizenRequest {
 }
 
 export interface RegisterAssociationRequest {
+    associationName: string;
+    ownerFirstName: string;
+    ownerLastName: string;
+    email: string;
+    phone: string;
+    password: string;
     description: string;
     address: string;
-    website?: string;
-    email: string;
-    password: string;
+    webSite?: string;
 }
 
 export interface LoginRequest {

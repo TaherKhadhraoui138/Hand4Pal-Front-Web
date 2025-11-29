@@ -15,11 +15,11 @@
             <button class="nav-btn" [class.active]="activeTab === 'campaigns'" (click)="activeTab = 'campaigns'">
                 <span class="icon">📢</span> Campaigns
             </button>
-            <button class="nav-btn" [class.active]="activeTab === 'comments'" (click)="activeTab = 'comments'">
-                <span class="icon">💬</span> Comments
-            </button>
             <button class="nav-btn" [class.active]="activeTab === 'associations'" (click)="activeTab = 'associations'">
                 <span class="icon">🏢</span> Associations
+            </button>
+            <button class="nav-btn" [class.active]="activeTab === 'comments'" (click)="activeTab = 'comments'">
+                <span class="icon">💬</span> Comments
             </button>
         </nav>
     </aside>
@@ -39,107 +39,141 @@
             <div *ngIf="activeTab === 'dashboard'" class="dashboard-grid">
                 <div class="stat-card">
                     <h3>Total Users</h3>
-                    <p class="stat-value">1,234</p>
-                    <span class="stat-trend positive">+12% this week</span>
+                    <p class="stat-value">{{ users.length }}</p>
+                    <span class="stat-trend positive">All Users</span>
+                </div>
+                <div class="stat-card">
+                    <h3>Pending Associations</h3>
+                    <p class="stat-value">{{ pendingAssociations.length }}</p>
+                    <span class="stat-trend warning">Requires attention</span>
                 </div>
                 <div class="stat-card">
                     <h3>Active Campaigns</h3>
-                    <p class="stat-value">56</p>
-                    <span class="stat-trend positive">+5 new today</span>
+                    <p class="stat-value">—</p>
+                    <span class="stat-trend">Coming soon</span>
                 </div>
                 <div class="stat-card">
                     <h3>Total Donations</h3>
-                    <p class="stat-value">$125,000</p>
-                    <span class="stat-trend positive">+8% this month</span>
+                    <p class="stat-value">—</p>
+                    <span class="stat-trend">Coming soon</span>
                 </div>
-                <div class="stat-card">
-                    <h3>Pending Approvals</h3>
-                    <p class="stat-value">12</p>
-                    <span class="stat-trend warning">Requires attention</span>
+            </div>
+
+            <!-- Users Management -->
+            <div *ngIf="activeTab === 'users'">
+                <div class="table-actions">
+                    <input type="text" [(ngModel)]="searchQuery" (input)="onSearch()" placeholder="Search users..."
+                        class="search-input">
+                </div>
+
+                <div *ngIf="isLoading" class="loading-state">
+                    Loading users...
+                </div>
+
+                <div *ngIf="!isLoading && users.length === 0" class="empty-state">
+                    <p>No users found</p>
+                </div>
+
+                <div *ngIf="!isLoading && users.length > 0" class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Type</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let user of users">
+                                <td>{{ user.id }}</td>
+                                <td>{{ user.firstName || '—' }} {{ user.lastName || '' }}</td>
+                                <td>{{ user.email }}</td>
+                                <td>{{ user.phone || '—' }}</td>
+                                <td><span class="status-badge">{{ user.userType }}</span></td>
+                                <td>
+                                    <button class="btn btn-danger btn-sm" (click)="onDeleteUser(user.id)">
+                                        Delete
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Associations Management -->
+            <div *ngIf="activeTab === 'associations'">
+                <div class="section-header">
+                    <h3>Pending Associations</h3>
+                    <p>Review and approve association registration requests</p>
+                </div>
+
+                <div *ngIf="isLoading" class="loading-state">
+                    Loading pending associations...
+                </div>
+
+                <div *ngIf="!isLoading && pendingAssociations.length === 0" class="empty-state">
+                    <p>No pending associations to review</p>
+                </div>
+
+                <div *ngIf="!isLoading && pendingAssociations.length > 0" class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Association Name</th>
+                                <th>Owner Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Description</th>
+                                <th>Address</th>
+                                <th>Website</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let association of pendingAssociations">
+                                <td>{{ association.id }}</td>
+                                <td><strong>{{ association.associationName }}</strong></td>
+                                <td>{{ association.ownerFirstName }} {{ association.ownerLastName }}</td>
+                                <td>{{ association.email }}</td>
+                                <td>{{ association.phone }}</td>
+                                <td class="truncate">{{ association.description }}</td>
+                                <td class="truncate">{{ association.address }}</td>
+                                <td>
+                                    <a *ngIf="association.webSite" [href]="association.webSite" target="_blank"
+                                        class="link">
+                                        Visit
+                                    </a>
+                                    <span *ngIf="!association.webSite">—</span>
+                                </td>
+                                <td class="actions">
+                                    <button class="btn btn-success btn-sm"
+                                        (click)="onApproveAssociation(association.id)" title="Approve">
+                                        ✓ Approve
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" (click)="onRejectAssociation(association.id)"
+                                        title="Reject">
+                                        ✗ Reject
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
             <!-- Campaigns Management -->
-            <div *ngIf="activeTab === 'campaigns'" class="table-container">
-                <div class="table-actions">
-                    <input type="text" placeholder="Search campaigns..." class="search-input">
-                    <div class="filter-group">
-                        <select>
-                            <option>All Status</option>
-                            <option>Active</option>
-                            <option>Pending</option>
-                            <option>Rejected</option>
-                        </select>
-                    </div>
-                </div>
-
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Campaign</th>
-                            <th>Organizer</th>
-                            <th>Goal</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngFor="let i of [1,2,3,4,5]">
-                            <td>
-                                <div class="campaign-cell">
-                                    <strong>Emergency Medical Aid</strong>
-                                    <span>Created 2 days ago</span>
-                                </div>
-                            </td>
-                            <td>Dr. Sarah Smith</td>
-                            <td>$100,000</td>
-                            <td><span class="status-badge pending">Pending</span></td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button class="btn-icon approve" title="Approve">✓</button>
-                                    <button class="btn-icon reject" title="Reject">✕</button>
-                                    <button class="btn-icon" title="View">👁️</button>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div *ngIf="activeTab === 'campaigns'" class="empty-state">
+                <p>Campaign management coming soon</p>
             </div>
 
-            <!-- Users Management -->
-            <div *ngIf="activeTab === 'users'" class="table-container">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>User</th>
-                            <th>Email</th>
-                            <th>Role</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngFor="let i of [1,2,3]">
-                            <td>
-                                <div class="user-cell">
-                                    <div class="avatar-xs"></div>
-                                    <span>John Doe</span>
-                                </div>
-                            </td>
-                            <td>john@example.com</td>
-                            <td>User</td>
-                            <td><span class="status-badge active">Active</span></td>
-                            <td>
-                                <button class="btn-sm btn-outline">Edit</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Placeholder for other tabs -->
-            <div *ngIf="['comments', 'associations'].includes(activeTab)" class="empty-state">
-                <p>Management interface for {{ activeTab }} coming soon.</p>
+            <!-- Comments Management -->
+            <div *ngIf="activeTab === 'comments'" class="empty-state">
+                <p>Comment management coming soon</p>
             </div>
         </div>
     </main>

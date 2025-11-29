@@ -14,10 +14,20 @@ import { map } from 'rxjs/operators';
 })
 export class NavbarComponent {
   isAuthenticated$: Observable<boolean>;
+  isAdmin$: Observable<boolean>;
+  isAssociation$: Observable<boolean>;
 
   constructor(public authViewModel: AuthViewModel) {
     this.isAuthenticated$ = this.authViewModel.currentUser$.pipe(
       map(user => !!user)
+    );
+
+    this.isAdmin$ = this.authViewModel.currentUser$.pipe(
+      map(user => user?.userType === 'ADMINISTRATOR')
+    );
+
+    this.isAssociation$ = this.authViewModel.currentUser$.pipe(
+      map(user => user?.userType === 'ASSOCIATION')
     );
   }
 

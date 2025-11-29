@@ -101,7 +101,9 @@ export class AuthViewModel {
         this.clearMessages();
 
         try {
-            console.log('Tentative de connexion avec:', { email: data.email });
+            console.log('Tentative de connexion avec:', data);
+            console.log('Email:', data.email);
+            console.log('Password length:', data.password?.length);
             const response = await this.authService.login(data).toPromise();
             console.log('Connexion réussie:', response);
             this.setSuccess('Connexion réussie !');
@@ -249,6 +251,9 @@ export class AuthViewModel {
             console.error('Erreur de connexion - vérifiez l\'URL de l\'API:', error);
         } else if (error.status === 401) {
             errorMessage = 'Email ou mot de passe incorrect.';
+        } else if (error.status === 403) {
+            errorMessage = 'Accès refusé. Vérifiez vos identifiants ou contactez l\'administrateur.';
+            console.error('403 Forbidden - Corps de la requête:', error.error);
         } else if (error.status === 409) {
             errorMessage = 'Cet email est déjà utilisé.';
         } else if (error.status === 500) {

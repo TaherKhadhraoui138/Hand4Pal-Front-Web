@@ -65,12 +65,16 @@ export class RegisterComponent implements OnInit, OnDestroy {
       }, { validators: this.passwordMatchValidator });
     } else {
       this.registerForm = this.fb.group({
-        description: ['', [Validators.required]],
-        address: ['', [Validators.required]],
-        website: [''],
+        associationName: ['', [Validators.required]],
+        ownerFirstName: ['', [Validators.required]],
+        ownerLastName: ['', [Validators.required]],
+        phone: ['', [Validators.required]],
         email: ['', [Validators.required, Validators.email]],
         password: ['', [Validators.required, Validators.minLength(6)]],
-        confirmPassword: ['', [Validators.required]]
+        confirmPassword: ['', [Validators.required]],
+        description: ['', [Validators.required]],
+        address: ['', [Validators.required]],
+        webSite: ['']
       }, { validators: this.passwordMatchValidator });
     }
   }

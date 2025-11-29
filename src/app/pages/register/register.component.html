@@ -65,9 +65,46 @@
             <!-- Association Fields -->
             <div *ngIf="userType === 'association'">
                 <div class="form-group">
+                    <label for="associationName">Association Name</label>
+                    <input type="text" id="associationName" formControlName="associationName"
+                        placeholder="Association Espoir" [class.error]="isFieldInvalid('associationName')">
+                    <span class="error-message" *ngIf="isFieldInvalid('associationName')">
+                        {{ getFieldError('associationName') }}
+                    </span>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="ownerFirstName">Owner First Name</label>
+                        <input type="text" id="ownerFirstName" formControlName="ownerFirstName" placeholder="Samir"
+                            [class.error]="isFieldInvalid('ownerFirstName')">
+                        <span class="error-message" *ngIf="isFieldInvalid('ownerFirstName')">
+                            {{ getFieldError('ownerFirstName') }}
+                        </span>
+                    </div>
+                    <div class="form-group">
+                        <label for="ownerLastName">Owner Last Name</label>
+                        <input type="text" id="ownerLastName" formControlName="ownerLastName" placeholder="Benali"
+                            [class.error]="isFieldInvalid('ownerLastName')">
+                        <span class="error-message" *ngIf="isFieldInvalid('ownerLastName')">
+                            {{ getFieldError('ownerLastName') }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Phone</label>
+                    <input type="tel" id="phone" formControlName="phone" placeholder="0611223344"
+                        [class.error]="isFieldInvalid('phone')">
+                    <span class="error-message" *ngIf="isFieldInvalid('phone')">
+                        {{ getFieldError('phone') }}
+                    </span>
+                </div>
+
+                <div class="form-group">
                     <label for="description">Organization Description</label>
                     <textarea id="description" formControlName="description" rows="3"
-                        placeholder="Brief description of your organization"
+                        placeholder="Aide aux personnes dans le besoin."
                         [class.error]="isFieldInvalid('description')"></textarea>
                     <span class="error-message" *ngIf="isFieldInvalid('description')">
                         {{ getFieldError('description') }}
@@ -76,16 +113,16 @@
 
                 <div class="form-group">
                     <label for="address">Address</label>
-                    <input type="text" id="address" formControlName="address" placeholder="123 Main Street, City"
-                        [class.error]="isFieldInvalid('address')">
+                    <input type="text" id="address" formControlName="address"
+                        placeholder="12 Rue de la Paix, 75001 Paris" [class.error]="isFieldInvalid('address')">
                     <span class="error-message" *ngIf="isFieldInvalid('address')">
                         {{ getFieldError('address') }}
                     </span>
                 </div>
 
                 <div class="form-group">
-                    <label for="website">Website (Optional)</label>
-                    <input type="url" id="website" formControlName="website" placeholder="https://example.org">
+                    <label for="webSite">Website (Optional)</label>
+                    <input type="url" id="webSite" formControlName="webSite" placeholder="https://espoir.org">
                 </div>
             </div>
 
