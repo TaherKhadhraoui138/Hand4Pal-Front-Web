@@ -67,22 +67,20 @@ export class AuthService {
 
     /**
      * Enregistrer un citoyen
+     * Note: Ne connecte pas automatiquement l'utilisateur après l'inscription
      */
     registerCitizen(request: RegisterCitizenRequest): Observable<AuthResponse> {
-        return this.http.post<AuthResponse>(`${this.API_URL}/register/citizen`, request)
-            .pipe(
-                tap(response => this.handleAuthResponse(response))
-            );
+        return this.http.post<AuthResponse>(`${this.API_URL}/register/citizen`, request);
+        // Pas de handleAuthResponse - l'utilisateur doit se connecter manuellement
     }
 
     /**
      * Enregistrer une association
+     * Note: Ne connecte pas automatiquement - l'association doit être approuvée par un admin
      */
     registerAssociation(request: RegisterAssociationRequest): Observable<AuthResponse> {
-        return this.http.post<AuthResponse>(`${this.API_URL}/register/association`, request)
-            .pipe(
-                tap(response => this.handleAuthResponse(response))
-            );
+        return this.http.post<AuthResponse>(`${this.API_URL}/register/association`, request);
+        // Pas de handleAuthResponse - l'association doit attendre l'approbation
     }
 
     /**
