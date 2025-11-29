@@ -5,6 +5,17 @@
             <p>Create an account to start fundraising</p>
         </div>
 
+        <!-- Messages d'erreur et de succès -->
+        <div *ngIf="error" class="alert alert-danger">
+            <span>{{ error }}</span>
+            <button type="button" class="close-btn" (click)="closeMessage()">&times;</button>
+        </div>
+
+        <div *ngIf="success" class="alert alert-success">
+            <span>{{ success }}</span>
+            <button type="button" class="close-btn" (click)="closeMessage()">&times;</button>
+        </div>
+
         <!-- User Type Selection -->
         <div class="user-type-selector">
             <button type="button" class="type-btn" [class.active]="userType === 'citizen'"
@@ -19,23 +30,35 @@
             </button>
         </div>
 
-        <form class="auth-form">
+        <form class="auth-form" [formGroup]="registerForm" (ngSubmit)="onSubmit()">
             <!-- Citizen Fields -->
             <div *ngIf="userType === 'citizen'">
                 <div class="form-row">
                     <div class="form-group">
                         <label for="firstName">First Name</label>
-                        <input type="text" id="firstName" placeholder="John">
+                        <input type="text" id="firstName" formControlName="firstName" placeholder="John"
+                            [class.error]="isFieldInvalid('firstName')">
+                        <span class="error-message" *ngIf="isFieldInvalid('firstName')">
+                            {{ getFieldError('firstName') }}
+                        </span>
                     </div>
                     <div class="form-group">
                         <label for="lastName">Last Name</label>
-                        <input type="text" id="lastName" placeholder="Doe">
+                        <input type="text" id="lastName" formControlName="lastName" placeholder="Doe"
+                            [class.error]="isFieldInvalid('lastName')">
+                        <span class="error-message" *ngIf="isFieldInvalid('lastName')">
+                            {{ getFieldError('lastName') }}
+                        </span>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="phone">Phone</label>
-                    <input type="tel" id="phone" placeholder="+1 234 567 8900">
+                    <input type="tel" id="phone" formControlName="phone" placeholder="+1 234 567 8900"
+                        [class.error]="isFieldInvalid('phone')">
+                    <span class="error-message" *ngIf="isFieldInvalid('phone')">
+                        {{ getFieldError('phone') }}
+                    </span>
                 </div>
             </div>
 
@@ -43,37 +66,61 @@
             <div *ngIf="userType === 'association'">
                 <div class="form-group">
                     <label for="description">Organization Description</label>
-                    <textarea id="description" rows="3" placeholder="Brief description of your organization"></textarea>
+                    <textarea id="description" formControlName="description" rows="3"
+                        placeholder="Brief description of your organization"
+                        [class.error]="isFieldInvalid('description')"></textarea>
+                    <span class="error-message" *ngIf="isFieldInvalid('description')">
+                        {{ getFieldError('description') }}
+                    </span>
                 </div>
 
                 <div class="form-group">
                     <label for="address">Address</label>
-                    <input type="text" id="address" placeholder="123 Main Street, City">
+                    <input type="text" id="address" formControlName="address" placeholder="123 Main Street, City"
+                        [class.error]="isFieldInvalid('address')">
+                    <span class="error-message" *ngIf="isFieldInvalid('address')">
+                        {{ getFieldError('address') }}
+                    </span>
                 </div>
 
                 <div class="form-group">
                     <label for="website">Website (Optional)</label>
-                    <input type="url" id="website" placeholder="https://example.org">
+                    <input type="url" id="website" formControlName="website" placeholder="https://example.org">
                 </div>
             </div>
 
             <!-- Common Fields -->
             <div class="form-group">
                 <label for="email">Email Address</label>
-                <input type="email" id="email" placeholder="name@example.com">
+                <input type="email" id="email" formControlName="email" placeholder="name@example.com"
+                    [class.error]="isFieldInvalid('email')">
+                <span class="error-message" *ngIf="isFieldInvalid('email')">
+                    {{ getFieldError('email') }}
+                </span>
             </div>
 
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" placeholder="••••••••">
+                <input type="password" id="password" formControlName="password" placeholder="••••••••"
+                    [class.error]="isFieldInvalid('password')">
+                <span class="error-message" *ngIf="isFieldInvalid('password')">
+                    {{ getFieldError('password') }}
+                </span>
             </div>
 
             <div class="form-group">
                 <label for="confirmPassword">Confirm Password</label>
-                <input type="password" id="confirmPassword" placeholder="••••••••">
+                <input type="password" id="confirmPassword" formControlName="confirmPassword" placeholder="••••••••"
+                    [class.error]="isFieldInvalid('confirmPassword')">
+                <span class="error-message" *ngIf="isFieldInvalid('confirmPassword')">
+                    {{ getFieldError('confirmPassword') }}
+                </span>
             </div>
 
-            <button type="submit" class="btn btn-primary btn-block">Create Account</button>
+            <button type="submit" class="btn btn-primary btn-block" [disabled]="loading">
+                <span *ngIf="!loading">Create Account</span>
+                <span *ngIf="loading">Loading...</span>
+            </button>
         </form>
 
         <div class="auth-footer">

@@ -5,22 +5,44 @@
             <p>Sign in to continue your journey</p>
         </div>
 
-        <form class="auth-form">
+        <!-- Messages d'erreur et de succès -->
+        <div *ngIf="error" class="alert alert-danger">
+            <span>{{ error }}</span>
+            <button type="button" class="close-btn" (click)="closeMessage()">&times;</button>
+        </div>
+
+        <div *ngIf="success" class="alert alert-success">
+            <span>{{ success }}</span>
+            <button type="button" class="close-btn" (click)="closeMessage()">&times;</button>
+        </div>
+
+        <form class="auth-form" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
             <div class="form-group">
                 <label for="email">Email Address</label>
-                <input type="email" id="email" placeholder="name@example.com">
+                <input type="email" id="email" formControlName="email" placeholder="name@example.com"
+                    [class.error]="isFieldInvalid('email')">
+                <span class="error-message" *ngIf="isFieldInvalid('email')">
+                    {{ getFieldError('email') }}
+                </span>
             </div>
 
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" placeholder="••••••••">
+                <input type="password" id="password" formControlName="password" placeholder="••••••••"
+                    [class.error]="isFieldInvalid('password')">
+                <span class="error-message" *ngIf="isFieldInvalid('password')">
+                    {{ getFieldError('password') }}
+                </span>
             </div>
 
             <div class="form-actions">
                 <a href="#" class="forgot-password">Forgot password?</a>
             </div>
 
-            <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+            <button type="submit" class="btn btn-primary btn-block" [disabled]="loading">
+                <span *ngIf="!loading">Sign In</span>
+                <span *ngIf="loading">Loading...</span>
+            </button>
         </form>
 
         <div class="auth-footer">
