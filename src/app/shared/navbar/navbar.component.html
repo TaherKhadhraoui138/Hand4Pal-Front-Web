@@ -7,8 +7,18 @@
         <div class="nav-links">
             <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
             <a routerLink="/campaigns" routerLinkActive="active">Campaigns</a>
-            <a routerLink="/login" class="btn btn-outline btn-sm">Login</a>
-            <a routerLink="/register" class="btn btn-primary btn-sm">Start Fundraising</a>
+
+            <!-- Afficher si NON connecté -->
+            <ng-container *ngIf="!(isAuthenticated$ | async)">
+                <a routerLink="/login" class="btn btn-outline btn-sm">Login</a>
+                <a routerLink="/register" class="btn btn-primary btn-sm">Start Fundraising</a>
+            </ng-container>
+
+            <!-- Afficher si connecté -->
+            <ng-container *ngIf="isAuthenticated$ | async">
+                <a routerLink="/profile" class="btn btn-outline btn-sm">Profile</a>
+                <button (click)="logout()" class="btn btn-primary btn-sm">Logout</button>
+            </ng-container>
         </div>
     </div>
 </nav>

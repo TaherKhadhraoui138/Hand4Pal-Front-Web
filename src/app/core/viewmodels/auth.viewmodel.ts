@@ -109,7 +109,9 @@ export class AuthViewModel {
 
             // Rediriger selon le rôle d'utilisateur
             setTimeout(() => {
-                if (response?.role === 'ASSOCIATION') {
+                if (response?.role === 'ADMINISTRATOR') {
+                    this.router.navigate(['/admin']);
+                } else if (response?.role === 'ASSOCIATION') {
                     this.router.navigate(['/association-dashboard']);
                 } else {
                     this.router.navigate(['/']);
@@ -140,7 +142,9 @@ export class AuthViewModel {
 
             // Rediriger selon le rôle d'utilisateur
             setTimeout(() => {
-                if (response?.role === 'ASSOCIATION') {
+                if (response?.role === 'ADMINISTRATOR') {
+                    this.router.navigate(['/admin']);
+                } else if (response?.role === 'ASSOCIATION') {
                     this.router.navigate(['/association-dashboard']);
                 } else {
                     this.router.navigate(['/']);
