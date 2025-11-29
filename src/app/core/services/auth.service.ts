@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Observable, BehaviorSubject, throwError } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import {
     RegisterCitizenRequest,
@@ -140,6 +140,29 @@ export class AuthService {
         return new HttpHeaders({
             'Content-Type': 'application/json'
         });
+    }
+
+    /**
+     * Rafraîchir le token d'accès avec le refresh token
+     */
+    refreshAccessToken(): Observable<AuthResponse> {
+        const refreshToken = localStorage.getItem('refreshToken');
+
+        if (!refreshToken) {
+            return throwError(() => new Error('No refresh token available'));
+        }
+
+        return this.http.post<AuthResponse>(`${this.API_URL}/refresh`, { refreshToken })
+            .pipe(
+                tap(response => {
+                    // Mettre à jour seulement le token, pas le user
+                    localStorage.setItem('authToken', response.token);
+                    if (response.refreshToken) {
+                        localStorage.setItem('refreshToken', response.refreshToken);
+                    }
+                    this.tokenSubject.next(response.token);
+                })
+            );
     }
 
     // ============================================
