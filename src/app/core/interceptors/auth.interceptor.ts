@@ -21,11 +21,16 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
     // Cloner la requête et ajouter le token si disponible
     if (token) {
+        console.log('[Interceptor] Adding token to request:', req.url);
+        console.log('[Interceptor] Token value:', token.substring(0, 50) + '...');
         req = req.clone({
             setHeaders: {
                 Authorization: `Bearer ${token}`
             }
         });
+        console.log('[Interceptor] Request headers after clone:', req.headers.get('Authorization'));
+    } else {
+        console.warn('[Interceptor] No token available for request:', req.url);
     }
 
     return next(req).pipe(

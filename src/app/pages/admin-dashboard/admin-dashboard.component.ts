@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UserService } from '../../core/services/user.service';
 import { AdminService } from '../../core/services/admin.service';
+import { AuthService } from '../../core/services/auth.service';
 import { User } from '../../core/models/auth.models';
 
 @Component({
@@ -14,14 +15,15 @@ import { User } from '../../core/models/auth.models';
 })
 export class AdminDashboardComponent implements OnInit {
     activeTab: string = 'dashboard';
-    users: User[] = [];
+    users: any[] = [];  // Using any[] because API returns userId, not id
     pendingAssociations: any[] = [];
     isLoading = false;
     searchQuery = '';
 
     constructor(
         private userService: UserService,
-        private adminService: AdminService
+        private adminService: AdminService,
+        private authService: AuthService
     ) { }
 
     ngOnInit(): void {
@@ -61,14 +63,21 @@ export class AdminDashboardComponent implements OnInit {
         }
     }
 
-    onDeleteUser(id: number): void {
+    onDeleteUser(userId: number): void {
+        if (!userId) {
+            console.error('User ID is undefined!');
+            alert('Cannot delete user: ID is missing');
+            return;
+        }
         if (confirm('Are you sure you want to delete this user?')) {
-            this.userService.deleteUser(id).subscribe({
+            this.userService.deleteUser(userId).subscribe({
                 next: () => {
-                    this.users = this.users.filter(u => u.id !== id);
+                    alert('User deleted successfully!');
+                    window.location.reload();  // Refresh the whole page
                 },
                 error: (error) => {
                     console.error('Failed to delete user', error);
+                    alert('Failed to delete user. Please try again.');
                 }
             });
         }
@@ -91,23 +100,13 @@ export class AdminDashboardComponent implements OnInit {
 
     onApproveAssociation(id: number): void {
         if (confirm('Are you sure you want to approve this association?')) {
-            // Debug logging
-            console.log('Approving association ID:', id);
-            console.log('Current token:', this.adminService['authService'].tokenValue);
-            console.log('Current user:', this.adminService['authService'].currentUserValue);
-
             this.adminService.approveAssociation(id).subscribe({
                 next: () => {
                     this.pendingAssociations = this.pendingAssociations.filter(a => a.id !== id);
-                    console.log('Association approved successfully');
                     alert('Association approved successfully!');
                 },
                 error: (error) => {
                     console.error('Failed to approve association', error);
-                    console.error('Error status:', error.status);
-                    console.error('Error message:', error.message);
-                    console.error('Error body:', error.error);
-
                     if (error.status === 403) {
                         alert('Access denied. Please make sure you are logged in as an administrator.');
                     } else {
@@ -120,18 +119,13 @@ export class AdminDashboardComponent implements OnInit {
 
     onRejectAssociation(id: number): void {
         if (confirm('Are you sure you want to reject this association?')) {
-            console.log('Rejecting association ID:', id);
-
             this.adminService.rejectAssociation(id).subscribe({
                 next: () => {
                     this.pendingAssociations = this.pendingAssociations.filter(a => a.id !== id);
-                    console.log('Association rejected successfully');
                     alert('Association rejected successfully!');
                 },
                 error: (error) => {
                     console.error('Failed to reject association', error);
-                    console.error('Error status:', error.status);
-
                     if (error.status === 403) {
                         alert('Access denied. Please make sure you are logged in as an administrator.');
                     } else {

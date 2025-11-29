@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { UserListResponse, UserDetailResponse, UserUpdateRequest } from '../models/admin.models';
-import { AuthService } from './auth.service';
 
 @Injectable({
     providedIn: 'root'
@@ -10,43 +9,43 @@ import { AuthService } from './auth.service';
 export class AdminService {
     private readonly API_URL = 'http://localhost:8080/api/admin';
 
-    constructor(private http: HttpClient, private authService: AuthService) { }
+    constructor(private http: HttpClient) { }
 
-    private getHeaders(): HttpHeaders {
-        return this.authService.getAuthHeaders();
-    }
+    // Note: L'intercepteur authInterceptor ajoute automatiquement le token JWT
 
     getAllUsers(): Observable<UserListResponse[]> {
-        return this.http.get<UserListResponse[]>(`${this.API_URL}/users`, { headers: this.getHeaders() });
+        return this.http.get<UserListResponse[]>(`${this.API_URL}/users`);
     }
 
     getUserById(id: number): Observable<UserDetailResponse> {
-        return this.http.get<UserDetailResponse>(`${this.API_URL}/users/${id}`, { headers: this.getHeaders() });
+        return this.http.get<UserDetailResponse>(`${this.API_URL}/users/${id}`);
     }
 
     updateUser(id: number, request: UserUpdateRequest): Observable<UserDetailResponse> {
-        return this.http.put<UserDetailResponse>(`${this.API_URL}/users/${id}`, request, { headers: this.getHeaders() });
+        return this.http.put<UserDetailResponse>(`${this.API_URL}/users/${id}`, request);
     }
 
     deleteUser(id: number): Observable<void> {
-        return this.http.delete<void>(`${this.API_URL}/users/${id}`, { headers: this.getHeaders() });
+        return this.http.delete<void>(`${this.API_URL}/users/${id}`);
     }
 
     searchUsers(query: string): Observable<UserListResponse[]> {
         const params = new HttpParams().set('q', query);
-        return this.http.get<UserListResponse[]>(`${this.API_URL}/users/search`, { headers: this.getHeaders(), params });
+        return this.http.get<UserListResponse[]>(`${this.API_URL}/users/search`, { params });
     }
 
     // Association Management
     getPendingAssociations(): Observable<any[]> {
-        return this.http.get<any[]>(`${this.API_URL}/associations/pending`, { headers: this.getHeaders() });
+        return this.http.get<any[]>(`${this.API_URL}/associations/pending`);
     }
 
-    approveAssociation(id: number): Observable<void> {
-        return this.http.post<void>(`${this.API_URL}/associations/${id}/approve`, {}, { headers: this.getHeaders() });
+    approveAssociation(id: number, message: string = 'Bienvenue ! Votre compte a été activé.'): Observable<void> {
+        const params = new HttpParams().set('message', message);
+        return this.http.post<void>(`${this.API_URL}/associations/${id}/approve`, {}, { params });
     }
 
-    rejectAssociation(id: number): Observable<void> {
-        return this.http.post<void>(`${this.API_URL}/associations/${id}/reject`, {}, { headers: this.getHeaders() });
+    rejectAssociation(id: number, message: string = 'Votre demande a été refusée.'): Observable<void> {
+        const params = new HttpParams().set('message', message);
+        return this.http.post<void>(`${this.API_URL}/associations/${id}/reject`, {}, { params });
     }
 }

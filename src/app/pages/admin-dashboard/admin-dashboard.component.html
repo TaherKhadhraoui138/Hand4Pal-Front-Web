@@ -88,13 +88,13 @@
                         </thead>
                         <tbody>
                             <tr *ngFor="let user of users">
-                                <td>{{ user.id }}</td>
+                                <td>{{ user.userId }}</td>
                                 <td>{{ user.firstName || '—' }} {{ user.lastName || '' }}</td>
                                 <td>{{ user.email }}</td>
                                 <td>{{ user.phone || '—' }}</td>
-                                <td><span class="status-badge">{{ user.userType }}</span></td>
+                                <td><span class="status-badge">{{ user.role }}</span></td>
                                 <td>
-                                    <button class="btn btn-danger btn-sm" (click)="onDeleteUser(user.id)">
+                                    <button class="btn btn-danger btn-sm" (click)="onDeleteUser(user.userId)">
                                         Delete
                                     </button>
                                 </td>
