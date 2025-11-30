@@ -18,6 +18,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   loading = false;
   error: string | null = null;
   success: string | null = null;
+  showPassword = false;
 
   private destroy$ = new Subject<void>();
 
@@ -97,5 +98,12 @@ export class LoginComponent implements OnInit, OnDestroy {
    */
   closeMessage(): void {
     this.authViewModel.clearMessages();
+  }
+
+  /**
+   * Basculer la visibilité du mot de passe
+   */
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
   }
 }

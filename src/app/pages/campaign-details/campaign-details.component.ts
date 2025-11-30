@@ -110,6 +110,16 @@ export class CampaignDetailsComponent implements OnInit, OnDestroy {
     }
 
     /**
+     * Handle donation completion - reload campaign to update collected amount
+     */
+    onDonationComplete(): void {
+        const campaignId = this.route.snapshot.paramMap.get('id');
+        if (campaignId) {
+            this.campaignViewModel.loadCampaignById(+campaignId);
+        }
+    }
+
+    /**
      * Retry loading campaign
      */
     retryLoad(): void {

@@ -28,8 +28,14 @@
 
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" formControlName="password" placeholder="••••••••"
-                    [class.error]="isFieldInvalid('password')">
+                <div class="password-input-wrapper">
+                    <input [type]="showPassword ? 'text' : 'password'" id="password" formControlName="password" placeholder="••••••••"
+                        [class.error]="isFieldInvalid('password')">
+                    <button type="button" class="password-toggle" (click)="togglePasswordVisibility()" tabindex="-1">
+                        <span *ngIf="!showPassword">👁️</span>
+                        <span *ngIf="showPassword">🙈</span>
+                    </button>
+                </div>
                 <span class="error-message" *ngIf="isFieldInvalid('password')">
                     {{ getFieldError('password') }}
                 </span>

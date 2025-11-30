@@ -21,8 +21,8 @@
 
     /* Layout Dimensions */
     width: 95%;
-    max-width: 900px;
-    /* Wide enough for side-by-side */
+    max-width: 500px;
+    /* Narrower since we removed payment form */
     max-height: 90vh;
     /* Prevents overflow on small vertical screens */
     height: auto;
@@ -72,10 +72,6 @@
     /* Scrollable if vertical height is too small */
     padding: 0;
     /* Remove padding here, applied to children instead */
-
-    /* GRID LAYOUT: Left Side (Donation) vs Right Side (Form) */
-    display: grid;
-    grid-template-columns: 0.8fr 1fr;
 }
 
 /* Left Column */
@@ -83,7 +79,6 @@
     padding: 2rem;
     background-color: #f8fafc;
     /* Light gray to separate visually */
-    border-right: 1px solid #e2e8f0;
 }
 
 /* Right Column */
@@ -172,6 +167,42 @@ input[type="number"] {
 
 .custom-amount input {
     padding-left: 2.5rem;
+}
+
+/* Currency Selection */
+.currency-selection {
+    margin-top: 1rem;
+}
+
+.currency-selection label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: #334155;
+}
+
+.currency-selection select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.2s;
+    box-sizing: border-box;
+    background: white;
+    cursor: pointer;
+}
+
+.currency-selection select:focus {
+    border-color: var(--primary-color, #00a651);
+    box-shadow: 0 0 0 3px rgba(0, 166, 81, 0.1);
+}
+
+.currency-selection select:disabled {
+    background-color: #f1f5f9;
+    cursor: not-allowed;
 }
 
 input:focus {
@@ -292,6 +323,26 @@ input:focus {
     background-color: #008a43;
 }
 
+.btn-lg:disabled {
+    background-color: #94a3b8;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.btn-lg:disabled:hover {
+    background-color: #94a3b8;
+}
+
+.amount-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+input:disabled {
+    background-color: #f1f5f9;
+    cursor: not-allowed;
+}
+
 /* --- 6. Animations --- */
 @keyframes fadeIn {
     from {
@@ -326,18 +377,7 @@ input:focus {
         width: 95%;
     }
 
-    .modal-body {
-        grid-template-columns: 1fr;
-        /* Single column */
-    }
-
     .donation-details {
-        border-right: none;
-        border-bottom: 1px solid #e2e8f0;
-        padding: 1.5rem;
-    }
-
-    .payment-form {
         padding: 1.5rem;
     }
 

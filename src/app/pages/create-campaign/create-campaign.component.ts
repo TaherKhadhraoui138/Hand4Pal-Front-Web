@@ -100,7 +100,7 @@ export class CreateCampaign implements OnInit, OnDestroy {
             category: formValue.category,
             targetAmount: Number(formValue.targetAmount),
             endDate: endDateFormatted,
-            imageUrl: formValue.imageUrl || undefined
+            imageURL: formValue.imageUrl && formValue.imageUrl.trim() !== '' ? formValue.imageUrl.trim() : null
         };
 
         await this.campaignViewModel.createCampaign(campaignData);

@@ -1,19 +1,29 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
 import { UserService } from '../../core/services/user.service';
 import { AuthService } from '../../core/services/auth.service';
+import { DonationViewModel } from '../../core/viewmodels/donation.viewmodel';
 import { User } from '../../core/models/auth.models';
 
 @Component({
     selector: 'app-user-profile',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule],
+    imports: [CommonModule, ReactiveFormsModule, RouterLink],
     templateUrl: './user-profile.component.html',
     styleUrls: ['./user-profile.component.css']
 })
-export class UserProfileComponent implements OnInit {
+export class UserProfileComponent implements OnInit, OnDestroy {
+    // Inject all services using inject()
+    private fb = inject(FormBuilder);
+    private userService = inject(UserService);
+    private authService = inject(AuthService);
+    private router = inject(Router);
+    private donationViewModel = inject(DonationViewModel);
+    private destroy$ = new Subject<void>();
+
     profileForm: FormGroup;
     passwordForm: FormGroup;
     currentUser: User | null = null;
@@ -22,12 +32,12 @@ export class UserProfileComponent implements OnInit {
     errorMessage = '';
     activeTab = 'personal';
 
-    constructor(
-        private fb: FormBuilder,
-        private userService: UserService,
-        private authService: AuthService,
-        private router: Router
-    ) {
+    // Expose ViewModel observables for donations
+    donations$ = this.donationViewModel.myDonations$;
+    isLoadingDonations$ = this.donationViewModel.loading$;
+    totalDonated$ = this.donationViewModel.totalDonated$;
+
+    constructor() {
         this.profileForm = this.fb.group({
             firstName: ['', Validators.required],
             lastName: ['', Validators.required],
@@ -44,6 +54,20 @@ export class UserProfileComponent implements OnInit {
 
     ngOnInit(): void {
         this.loadProfile();
+        
+        // Subscribe to ViewModel error messages
+        this.donationViewModel.error$
+            .pipe(takeUntil(this.destroy$))
+            .subscribe(error => {
+                if (error && this.activeTab === 'donations') {
+                    this.errorMessage = error;
+                }
+            });
+    }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 
     passwordMatchValidator(g: FormGroup) {
@@ -146,5 +170,14 @@ export class UserProfileComponent implements OnInit {
         this.activeTab = tab;
         this.successMessage = '';
         this.errorMessage = '';
+
+        // Load donations when switching to donations tab
+        if (tab === 'donations' && !this.donationViewModel.isMyDonationsLoaded()) {
+            this.donationViewModel.loadMyDonations();
+        }
+    }
+
+    formatCurrency(amount: number, currency: string = 'USD'): string {
+        return this.donationViewModel.formatCurrency(amount, currency);
     }
 }

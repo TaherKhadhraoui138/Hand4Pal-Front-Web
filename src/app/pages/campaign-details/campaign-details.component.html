@@ -60,7 +60,7 @@
                             [class.active]="activeTab === 'comments'"
                             (click)="setActiveTab('comments')"
                         >Comments</button>
-                </div>
+                    </div>
 
                 <div class="content-body">
                     <!-- About Tab -->
@@ -144,7 +144,9 @@
     <app-donation-modal 
         *ngIf="isDonationModalOpen" 
         [campaignTitle]="state.campaign.title"
-        (closeModal)="closeDonationModal()">
+        [campaignId]="state.campaign.id"
+        (closeModal)="closeDonationModal()"
+        (donationComplete)="onDonationComplete()">
     </app-donation-modal>
 </div>
 </ng-container>
