@@ -19,10 +19,20 @@
 
                 <nav class="profile-nav">
                     <a href="javascript:void(0)" class="nav-item" [class.active]="activeTab === 'personal'"
-                        (click)="setActiveTab('personal')">Personal Info</a>
+                        (click)="setActiveTab('personal')">
+                        <span class="nav-icon">👤</span> Personal Info
+                    </a>
+                    <a href="javascript:void(0)" class="nav-item" [class.active]="activeTab === 'donations'"
+                        (click)="setActiveTab('donations')">
+                        <span class="nav-icon">💚</span> My Donations
+                    </a>
                     <a href="javascript:void(0)" class="nav-item" [class.active]="activeTab === 'security'"
-                        (click)="setActiveTab('security')">Security</a>
-                    <a href="javascript:void(0)" class="nav-item text-danger" (click)="logout()">Sign Out</a>
+                        (click)="setActiveTab('security')">
+                        <span class="nav-icon">🔒</span> Security
+                    </a>
+                    <a href="javascript:void(0)" class="nav-item text-danger" (click)="logout()">
+                        <span class="nav-icon">🚪</span> Sign Out
+                    </a>
                 </nav>
             </div>
 
@@ -70,6 +80,58 @@
                     </form>
                 </div>
 
+                <!-- My Donations Tab -->
+                <ng-container *ngIf="activeTab === 'donations'">
+                    <ng-container *ngIf="{ 
+                        donations: donations$ | async, 
+                        isLoading: isLoadingDonations$ | async,
+                        totalDonated: totalDonated$ | async 
+                    } as state">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>My Donations</h2>
+                                <p class="header-subtitle" *ngIf="state.donations && state.donations.length > 0">
+                                    Total donated: <strong>{{ formatCurrency(state.totalDonated || 0) }}</strong>
+                                </p>
+                            </div>
+
+                            <!-- Loading State -->
+                            <div class="donations-loading" *ngIf="state.isLoading">
+                                <div class="spinner"></div>
+                                <p>Loading your donations...</p>
+                            </div>
+
+                            <!-- Empty State -->
+                            <div class="donations-empty" *ngIf="!state.isLoading && (!state.donations || state.donations.length === 0)">
+                                <div class="empty-icon">💚</div>
+                                <h3>No donations yet</h3>
+                                <p>You haven't made any donations yet. Start making a difference today!</p>
+                                <a routerLink="/campaigns" class="btn btn-primary">Browse Campaigns</a>
+                            </div>
+
+                            <!-- Donations List -->
+                            <div class="donations-list" *ngIf="!state.isLoading && state.donations && state.donations.length > 0">
+                                <div class="donation-item" *ngFor="let donation of state.donations">
+                                    <div class="donation-icon">
+                                        💚
+                                    </div>
+                                    <div class="donation-info">
+                                        <h4 class="campaign-name">
+                                            <a [routerLink]="['/campaigns', donation.campaignId]">
+                                                {{ donation.campaign?.title || 'Campaign #' + donation.campaignId }}
+                                            </a>
+                                        </h4>
+                                        <p class="donation-date">{{ donation.donationDate | date:'MMM d, yyyy \"at\" h:mm a' }}</p>
+                                    </div>
+                                    <div class="donation-amount">
+                                        {{ formatCurrency(donation.amount, donation.currency) }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                </ng-container>
+
                 <!-- Security Tab -->
                 <div class="card" *ngIf="activeTab === 'security'">
                     <div class="card-header">
@@ -98,12 +160,21 @@
                         </div>
                     </form>
 
-                    <div class="card-header mt-4">
-                        <h2 class="text-danger">Danger Zone</h2>
-                    </div>
-                    <div class="p-4">
-                        <p>Once you delete your account, there is no going back. Please be certain.</p>
-                        <button type="button" class="btn btn-danger" (click)="onDeleteAccount()">Delete Account</button>
+                    <!-- Danger Zone -->
+                    <div class="danger-zone">
+                        <div class="danger-zone-header">
+                            <span class="danger-icon">⚠️</span>
+                            <h3>Danger Zone</h3>
+                        </div>
+                        <div class="danger-zone-content">
+                            <div class="danger-zone-info">
+                                <h4>Delete Account</h4>
+                                <p>Once you delete your account, there is no going back. All your data will be permanently removed.</p>
+                            </div>
+                            <button type="button" class="btn btn-danger" (click)="onDeleteAccount()">
+                                Delete Account
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

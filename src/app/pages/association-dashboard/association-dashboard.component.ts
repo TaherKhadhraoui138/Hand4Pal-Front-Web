@@ -234,7 +234,7 @@ export class AssociationDashboard implements OnInit, OnDestroy {
       category: this.editForm.category,
       targetAmount: this.editForm.targetAmount,
       endDate: this.editForm.endDate ? `${this.editForm.endDate}T23:59:59` : undefined,
-      imageUrl: this.editForm.imageUrl || undefined
+      imageURL: this.editForm.imageUrl && this.editForm.imageUrl.trim() !== '' ? this.editForm.imageUrl.trim() : undefined
     };
 
     this.campaignService.updateCampaign(this.editingCampaign.id, updateData)

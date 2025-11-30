@@ -76,7 +76,7 @@ export interface CampaignCreateRequest {
     category: CampaignCategory;
     targetAmount: number;
     endDate: string;  // Required - format: YYYY-MM-DD or ISO datetime
-    imageUrl?: string;
+    imageURL?: string | null;
 }
 
 export interface CampaignUpdateRequest {
@@ -85,7 +85,7 @@ export interface CampaignUpdateRequest {
     category?: CampaignCategory;
     targetAmount?: number;
     collectedAmount?: number;
-    imageUrl?: string;
+    imageURL?: string;
     endDate?: string;
 }
 

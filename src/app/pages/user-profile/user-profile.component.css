@@ -158,3 +158,247 @@
     gap: 1rem;
     margin-top: 2rem;
 }
+
+/* Navigation Icons */
+.nav-icon {
+    margin-right: 0.5rem;
+}
+
+/* Donations Section */
+.header-subtitle {
+    color: var(--light-text);
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0;
+}
+
+.header-subtitle strong {
+    color: var(--primary-color);
+    font-size: 1.1rem;
+}
+
+.donations-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2rem;
+    color: var(--light-text);
+}
+
+.donations-loading .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #e2e8f0;
+    border-top-color: var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.donations-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    text-align: center;
+}
+
+.donations-empty .empty-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.donations-empty h3 {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+    color: var(--dark-text);
+}
+
+.donations-empty p {
+    color: var(--light-text);
+    margin-bottom: 1.5rem;
+    max-width: 300px;
+}
+
+.donations-list {
+    padding: 0;
+}
+
+.donation-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem 2rem;
+    border-bottom: 1px solid #f1f5f9;
+    transition: background-color 0.2s;
+}
+
+.donation-item:last-child {
+    border-bottom: none;
+}
+
+.donation-item:hover {
+    background-color: #f8fafc;
+}
+
+.donation-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    border-radius: 50%;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.donation-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.donation-info .campaign-name {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 0.25rem 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.donation-info .campaign-name a {
+    color: var(--dark-text);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.donation-info .campaign-name a:hover {
+    color: var(--primary-color);
+}
+
+.donation-info .donation-date {
+    font-size: 0.85rem;
+    color: var(--light-text);
+    margin: 0;
+}
+
+.donation-amount {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    white-space: nowrap;
+}
+
+@media (max-width: 576px) {
+    .donation-item {
+        padding: 1rem 1.25rem;
+    }
+
+    .donation-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.25rem;
+    }
+
+    .donation-info .campaign-name {
+        font-size: 0.9rem;
+    }
+
+    .donation-amount {
+        font-size: 1rem;
+    }
+}
+
+/* Danger Zone */
+.danger-zone {
+    margin: 2rem;
+    border: 1px solid #fecaca;
+    border-radius: var(--radius-lg, 0.75rem);
+    background: linear-gradient(135deg, #fef2f2 0%, #fff5f5 100%);
+    overflow: hidden;
+}
+
+.danger-zone-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    background: #fecaca;
+    border-bottom: 1px solid #fca5a5;
+}
+
+.danger-zone-header .danger-icon {
+    font-size: 1.25rem;
+}
+
+.danger-zone-header h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #991b1b;
+}
+
+.danger-zone-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 1.5rem;
+}
+
+.danger-zone-info h4 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #991b1b;
+}
+
+.danger-zone-info p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: #b91c1c;
+    line-height: 1.5;
+}
+
+.danger-zone .btn-danger {
+    flex-shrink: 0;
+    padding: 0.625rem 1.25rem;
+    background: #dc2626;
+    color: white;
+    border: none;
+    border-radius: var(--radius-md, 0.5rem);
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.danger-zone .btn-danger:hover {
+    background: #b91c1c;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+@media (max-width: 576px) {
+    .danger-zone {
+        margin: 1.5rem 1rem;
+    }
+
+    .danger-zone-content {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+    }
+
+    .danger-zone .btn-danger {
+        width: 100%;
+    }
+}
