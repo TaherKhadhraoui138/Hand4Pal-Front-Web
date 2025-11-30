@@ -8,6 +8,7 @@ import { UserProfileComponent } from './pages/user-profile/user-profile.componen
 import { AdminDashboardComponent } from './pages/admin-dashboard/admin-dashboard.component';
 import { AssociationProfile } from './pages/association-profile/association-profile.component';
 import { AssociationDashboard } from './pages/association-dashboard/association-dashboard.component';
+import { AssociationCampaignDetailsComponent } from './pages/association-campaign-details/association-campaign-details.component';
 import { CreateCampaign } from './pages/create-campaign/create-campaign.component';
 import { authGuard } from './core/guards/auth.guard';
 
@@ -39,6 +40,12 @@ export const routes: Routes = [
     {
         path: 'association-dashboard',
         component: AssociationDashboard,
+        canActivate: [authGuard],
+        data: { role: 'ASSOCIATION' }
+    },
+    {
+        path: 'association-campaigns/:id',
+        component: AssociationCampaignDetailsComponent,
         canActivate: [authGuard],
         data: { role: 'ASSOCIATION' }
     },

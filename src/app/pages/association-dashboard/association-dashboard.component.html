@@ -15,14 +15,11 @@
             <button class="nav-btn" [class.active]="activeTab() === 'donations'" (click)="activeTab.set('donations')">
                 <span class="icon">💰</span> Donations
             </button>
-            <button class="nav-btn" [class.active]="activeTab() === 'analytics'" (click)="activeTab.set('analytics')">
-                <span class="icon">📈</span> Analytics
-            </button>
         </nav>
 
         <div class="sidebar-footer">
-            <a href="/association-profile" class="btn btn-outline">Profile Settings</a>
-            <a href="/create-campaign" class="btn btn-primary">Create Campaign</a>
+            <a routerLink="/association-profile" class="btn btn-outline">Profile Settings</a>
+            <a routerLink="/create-campaign" class="btn btn-primary">+ Create Campaign</a>
         </div>
     </aside>
 
@@ -31,45 +28,75 @@
         <header class="top-bar">
             <h2>{{ activeTab() | titlecase }}</h2>
             <div class="user-info">
-                <span>Helping Hands Palestine</span>
-                <div class="avatar-sm">HH</div>
+                <span>{{ associationName }}</span>
+                <div class="avatar-sm">{{ associationName.charAt(0) }}</div>
             </div>
         </header>
 
         <div class="content-area">
+            <!-- Use async pipes for reactive state -->
+            <ng-container *ngIf="{ loading: isLoading$ | async, error: error$ | async, campaigns: allCampaigns$ | async } as state">
             <!-- Overview Dashboard -->
             <div *ngIf="activeTab() === 'overview'" class="dashboard-grid">
                 <div class="stat-card">
                     <h3>Active Campaigns</h3>
-                    <p class="stat-value">8</p>
-                    <span class="stat-trend positive">+2 this month</span>
+                    <p class="stat-value">{{ activeCampaignsCount }}</p>
+                    <span class="stat-trend positive">Running</span>
                 </div>
                 <div class="stat-card">
                     <h3>Total Raised</h3>
-                    <p class="stat-value">$45,230</p>
-                    <span class="stat-trend positive">+15% this month</span>
+                    <p class="stat-value">{{ formatCurrency(totalRaised) }}</p>
+                    <span class="stat-trend positive">All time</span>
                 </div>
                 <div class="stat-card">
-                    <h3>Total Donors</h3>
-                    <p class="stat-value">324</p>
-                    <span class="stat-trend positive">+28 new donors</span>
+                    <h3>Pending Approval</h3>
+                    <p class="stat-value">{{ pendingCampaignsCount }}</p>
+                    <span class="stat-trend warning">Awaiting review</span>
                 </div>
                 <div class="stat-card">
-                    <h3>Avg. Donation</h3>
-                    <p class="stat-value">$139</p>
-                    <span class="stat-trend neutral">Same as last month</span>
+                    <h3>Total Campaigns</h3>
+                    <p class="stat-value">{{ allCampaigns.length }}</p>
+                    <span class="stat-trend neutral">All status</span>
                 </div>
 
-                <!-- Recent Activity -->
-                <div class="activity-section">
-                    <h3>Recent Activity</h3>
-                    <div class="activity-list">
-                        <div class="activity-item" *ngFor="let i of [1,2,3,4,5]">
-                            <div class="activity-icon">💵</div>
-                            <div class="activity-details">
-                                <strong>New donation received</strong>
-                                <p>Sarah M. donated $150 to "Emergency Medical Aid"</p>
-                                <span class="activity-time">2 hours ago</span>
+                <!-- Quick Actions -->
+                <div class="quick-actions">
+                    <h3>Quick Actions</h3>
+                    <div class="action-grid">
+                        <a routerLink="/create-campaign" class="action-card">
+                            <span class="action-icon">➕</span>
+                            <span>Create New Campaign</span>
+                        </a>
+                        <button class="action-card" (click)="activeTab.set('campaigns'); campaignTab = 'pending'">
+                            <span class="action-icon">⏳</span>
+                            <span>View Pending ({{ pendingCampaignsCount }})</span>
+                        </button>
+                        <button class="action-card" (click)="activeTab.set('campaigns'); campaignTab = 'active'">
+                            <span class="action-icon">✅</span>
+                            <span>Manage Active ({{ activeCampaignsCount }})</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Recent Campaigns -->
+                <div class="recent-campaigns">
+                    <h3>Recent Campaigns</h3>
+                    <div *ngIf="state.loading" class="loading-state">
+                        <div class="loading-spinner"></div>
+                        <p>Loading campaigns...</p>
+                    </div>
+                    <div *ngIf="!state.loading && state.campaigns?.length === 0" class="empty-state-mini">
+                        <p>No campaigns yet. <a routerLink="/create-campaign">Create your first campaign</a></p>
+                    </div>
+                    <div *ngIf="!state.loading && state.campaigns && state.campaigns.length > 0" class="campaign-list-mini">
+                        <div class="campaign-item-mini" *ngFor="let campaign of state.campaigns.slice(0, 5)">
+                            <div class="campaign-info">
+                                <strong>{{ campaign.title }}</strong>
+                                <span class="category-tag">{{ getCategoryName(campaign.category) }}</span>
+                            </div>
+                            <div class="campaign-stats-mini">
+                                <span class="status-badge" [class]="getStatusClass(campaign)">{{ getStatusLabel(campaign) }}</span>
+                                <span class="raised">{{ formatCurrency(campaign.collectedAmount || 0) }} / {{ formatCurrency(campaign.targetAmount) }}</span>
                             </div>
                         </div>
                     </div>
@@ -77,104 +104,199 @@
             </div>
 
             <!-- Campaigns Management -->
-            <div *ngIf="activeTab() === 'campaigns'" class="table-container">
-                <div class="table-actions">
-                    <input type="text" placeholder="Search campaigns..." class="search-input">
-                    <a href="/create-campaign" class="btn btn-primary">+ New Campaign</a>
+            <div *ngIf="activeTab() === 'campaigns'">
+                <div class="section-header">
+                    <h3>My Campaigns</h3>
+                    <a routerLink="/create-campaign" class="btn btn-primary">+ New Campaign</a>
                 </div>
 
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Campaign</th>
-                            <th>Goal</th>
-                            <th>Raised</th>
-                            <th>Progress</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngFor="let i of [1,2,3,4,5]">
-                            <td>
-                                <div class="campaign-cell">
-                                    <strong>Emergency Medical Aid</strong>
-                                    <span>Created 15 days ago</span>
-                                </div>
-                            </td>
-                            <td>$10,000</td>
-                            <td>$7,250</td>
-                            <td>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: 72.5%"></div>
-                                </div>
-                                <span class="progress-text">72.5%</span>
-                            </td>
-                            <td><span class="status-badge active">Active</span></td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button class="btn-icon" title="Edit">✏️</button>
-                                    <button class="btn-icon" title="View">👁️</button>
-                                    <button class="btn-icon" title="Pause">⏸️</button>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+                <!-- Campaign Tabs -->
+                <div class="campaign-tabs">
+                    <button 
+                        class="tab-btn" 
+                        [class.active]="campaignTab === 'active'"
+                        (click)="campaignTab = 'active'">
+                        Active ({{ activeCampaigns.length }})
+                    </button>
+                    <button 
+                        class="tab-btn" 
+                        [class.active]="campaignTab === 'pending'"
+                        (click)="campaignTab = 'pending'">
+                        Pending ({{ pendingCampaigns.length }})
+                    </button>
+                    <button 
+                        class="tab-btn" 
+                        [class.active]="campaignTab === 'expired'"
+                        (click)="campaignTab = 'expired'">
+                        Expired/Completed ({{ expiredCampaigns.length }})
+                    </button>
+                </div>
 
-            <!-- Donations View -->
-            <div *ngIf="activeTab() === 'donations'" class="donations-section">
-                <div class="table-actions">
-                    <input type="text" placeholder="Search donations..." class="search-input">
-                    <div class="filter-group">
-                        <select>
-                            <option>All Campaigns</option>
-                            <option>Emergency Medical Aid</option>
-                            <option>Education Fund</option>
-                            <option>Clean Water Project</option>
-                        </select>
-                        <select>
-                            <option>Last 30 Days</option>
-                            <option>Last 7 Days</option>
-                            <option>Last 3 Months</option>
-                            <option>All Time</option>
-                        </select>
+                <div *ngIf="state.loading" class="loading-state">
+                    <div class="loading-spinner"></div>
+                    <p>Loading campaigns...</p>
+                </div>
+
+                <div *ngIf="state.error && !state.loading" class="error-state">
+                    <p>{{ state.error }}</p>
+                    <button class="btn btn-primary" (click)="loadMyCampaigns()">Retry</button>
+                </div>
+
+                <!-- Active Campaigns -->
+                <div *ngIf="!state.loading && !state.error && campaignTab === 'active'">
+                    <div *ngIf="activeCampaigns.length === 0" class="empty-state">
+                        <div class="empty-icon">📢</div>
+                        <h3>No Active Campaigns</h3>
+                        <p>You don't have any active campaigns yet.</p>
+                        <a routerLink="/create-campaign" class="btn btn-primary">Create Campaign</a>
+                    </div>
+
+                    <div *ngIf="activeCampaigns.length > 0" class="campaigns-grid">
+                        <div class="campaign-card-manage" *ngFor="let campaign of activeCampaigns">
+                            <div class="campaign-header-manage">
+                                <span class="status-badge active">Active</span>
+                                <span class="days-remaining">{{ getDaysRemaining(campaign.endDate) }}</span>
+                            </div>
+                            <h4>{{ campaign.title }}</h4>
+                            <p class="campaign-category">{{ getCategoryName(campaign.category) }}</p>
+                            <div class="progress-section">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" [style.width.%]="getProgressPercentage(campaign)"></div>
+                                </div>
+                                <div class="progress-stats">
+                                    <span>{{ formatCurrency(campaign.collectedAmount || 0) }} raised</span>
+                                    <span>{{ getProgressPercentage(campaign) | number:'1.0-0' }}%</span>
+                                </div>
+                                <p class="goal-text">Goal: {{ formatCurrency(campaign.targetAmount) }}</p>
+                            </div>
+                            <div class="campaign-actions">
+                                <button class="btn btn-outline btn-sm" (click)="openEditModal(campaign)">✏️ Edit</button>
+                                <a [routerLink]="['/association-campaigns', campaign.id]" class="btn btn-outline btn-sm">👁️ View</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Donor</th>
-                            <th>Campaign</th>
-                            <th>Amount</th>
-                            <th>Date</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngFor="let i of [1,2,3,4,5,6,7,8]">
-                            <td>
-                                <div class="donor-cell">
-                                    <div class="avatar-xs">SM</div>
-                                    <span>Sarah Martinez</span>
+                <!-- Pending Campaigns -->
+                <div *ngIf="!state.loading && !state.error && campaignTab === 'pending'">
+                    <div *ngIf="pendingCampaigns.length === 0" class="empty-state">
+                        <div class="empty-icon">⏳</div>
+                        <h3>No Pending Campaigns</h3>
+                        <p>All your campaigns have been reviewed.</p>
+                    </div>
+
+                    <div *ngIf="pendingCampaigns.length > 0" class="campaigns-grid">
+                        <div class="campaign-card-manage" *ngFor="let campaign of pendingCampaigns">
+                            <div class="campaign-header-manage">
+                                <span class="status-badge pending">Pending Approval</span>
+                                <span class="created-date">{{ getRelativeTime(campaign.createdAt) }}</span>
+                            </div>
+                            <h4>{{ campaign.title }}</h4>
+                            <p class="campaign-category">{{ getCategoryName(campaign.category) }}</p>
+                            <p class="campaign-description">{{ campaign.description | slice:0:100 }}...</p>
+                            <div class="campaign-meta">
+                                <span>Goal: {{ formatCurrency(campaign.targetAmount) }}</span>
+                                <span>End: {{ campaign.endDate | date:'mediumDate' }}</span>
+                            </div>
+                            <div class="campaign-actions">
+                                <button class="btn btn-outline btn-sm" (click)="openEditModal(campaign)">✏️ Edit</button>
+                            </div>
+                            <p class="pending-notice">⏳ Waiting for admin approval</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Expired/Completed Campaigns -->
+                <div *ngIf="!state.loading && !state.error && campaignTab === 'expired'">
+                    <div *ngIf="expiredCampaigns.length === 0" class="empty-state">
+                        <div class="empty-icon">📋</div>
+                        <h3>No Expired Campaigns</h3>
+                        <p>You don't have any expired or completed campaigns.</p>
+                    </div>
+
+                    <div *ngIf="expiredCampaigns.length > 0" class="campaigns-grid">
+                        <div class="campaign-card-manage expired" *ngFor="let campaign of expiredCampaigns">
+                            <div class="campaign-header-manage">
+                                <span class="status-badge" [class]="getStatusClass(campaign)">{{ getStatusLabel(campaign) }}</span>
+                            </div>
+                            <h4>{{ campaign.title }}</h4>
+                            <p class="campaign-category">{{ getCategoryName(campaign.category) }}</p>
+                            <div class="progress-section">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" [style.width.%]="getProgressPercentage(campaign)"></div>
                                 </div>
-                            </td>
-                            <td>Emergency Medical Aid</td>
-                            <td class="amount-cell">$150</td>
-                            <td>Jan 28, 2024</td>
-                            <td><span class="status-badge completed">Completed</span></td>
-                        </tr>
-                    </tbody>
-                </table>
+                                <div class="progress-stats">
+                                    <span>{{ formatCurrency(campaign.collectedAmount || 0) }} raised</span>
+                                    <span>{{ getProgressPercentage(campaign) | number:'1.0-0' }}%</span>
+                                </div>
+                                <p class="goal-text">Goal: {{ formatCurrency(campaign.targetAmount) }}</p>
+                            </div>
+                            <div class="campaign-actions">
+                                <a [routerLink]="['/association-campaigns', campaign.id]" class="btn btn-outline btn-sm">👁️ View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <!-- Analytics (Placeholder) -->
-            <div *ngIf="activeTab() === 'analytics'" class="empty-state">
-                <h3>Analytics Dashboard</h3>
-                <p>Detailed analytics and reports will be available here.</p>
+            <!-- Donations View -->
+            <div *ngIf="activeTab() === 'donations'" class="empty-state">
+                <div class="empty-icon">💰</div>
+                <h3>Donations</h3>
+                <p>Donation tracking coming soon.</p>
             </div>
+            </ng-container>
         </div>
     </main>
 </div>
+
+<!-- Edit Campaign Modal -->
+<div *ngIf="isEditModalOpen" class="modal-overlay" (click)="closeEditModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h3>Edit Campaign</h3>
+            <button class="close-btn" (click)="closeEditModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>Title</label>
+                <input type="text" [(ngModel)]="editForm.title" class="form-control">
+            </div>
+            <div class="form-group">
+                <label>Category</label>
+                <select [(ngModel)]="editForm.category" class="form-control">
+                    <option *ngFor="let cat of categories" [value]="cat.value">{{ cat.label }}</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Target Amount ($)</label>
+                <input type="number" [(ngModel)]="editForm.targetAmount" class="form-control">
+            </div>
+            <div class="form-group">
+                <label>End Date</label>
+                <input type="date" [(ngModel)]="editForm.endDate" class="form-control">
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea [(ngModel)]="editForm.description" class="form-control" rows="4"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Image URL (optional)</label>
+                <input type="url" [(ngModel)]="editForm.imageUrl" class="form-control">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" (click)="closeEditModal()">Cancel</button>
+            <button class="btn btn-primary" (click)="saveEdit()">Save Changes</button>
+        </div>
+    </div>
+</div>
+
+<!-- Alert Modal -->
+<app-alert-modal
+    [isOpen]="alertModal.isOpen"
+    [title]="alertModal.title"
+    [message]="alertModal.message"
+    [type]="alertModal.type"
+    (closed)="closeAlert()">
+</app-alert-modal>

@@ -49,13 +49,13 @@
                 </div>
                 <div class="stat-card">
                     <h3>Active Campaigns</h3>
-                    <p class="stat-value">—</p>
-                    <span class="stat-trend">Coming soon</span>
+                    <p class="stat-value">{{ activeCampaigns.length }}</p>
+                    <span class="stat-trend positive">Running</span>
                 </div>
                 <div class="stat-card">
-                    <h3>Total Donations</h3>
-                    <p class="stat-value">—</p>
-                    <span class="stat-trend">Coming soon</span>
+                    <h3>Pending Campaigns</h3>
+                    <p class="stat-value">{{ pendingCampaigns.length }}</p>
+                    <span class="stat-trend warning">Awaiting review</span>
                 </div>
             </div>
 
@@ -167,8 +167,114 @@
             </div>
 
             <!-- Campaigns Management -->
-            <div *ngIf="activeTab === 'campaigns'" class="empty-state">
-                <p>Campaign management coming soon</p>
+            <div *ngIf="activeTab === 'campaigns'">
+                <div class="section-header">
+                    <h3>Campaign Management</h3>
+                    <p>Review, approve or reject campaign submissions</p>
+                </div>
+
+                <!-- Campaign Tabs -->
+                <div class="campaign-tabs">
+                    <button 
+                        class="tab-btn" 
+                        [class.active]="campaignTab === 'pending'"
+                        (click)="campaignTab = 'pending'">
+                        Pending ({{ pendingCampaigns.length }})
+                    </button>
+                    <button 
+                        class="tab-btn" 
+                        [class.active]="campaignTab === 'active'"
+                        (click)="campaignTab = 'active'">
+                        Active ({{ activeCampaigns.length }})
+                    </button>
+                </div>
+
+                <div *ngIf="isCampaignsLoading" class="loading-state">
+                    Loading campaigns...
+                </div>
+
+                <!-- Pending Campaigns -->
+                <div *ngIf="!isCampaignsLoading && campaignTab === 'pending'">
+                    <div *ngIf="pendingCampaigns.length === 0" class="empty-state">
+                        <p>No pending campaigns to review</p>
+                    </div>
+
+                    <div *ngIf="pendingCampaigns.length > 0" class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Title</th>
+                                    <th>Category</th>
+                                    <th>Association</th>
+                                    <th>Target Amount</th>
+                                    <th>End Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let campaign of pendingCampaigns">
+                                    <td>{{ campaign.id }}</td>
+                                    <td><strong>{{ campaign.title }}</strong></td>
+                                    <td><span class="category-badge">{{ getCategoryName(campaign.category) }}</span></td>
+                                    <td>{{ getAssociationDisplayName(campaign) }}</td>
+                                    <td>{{ formatCurrency(campaign.targetAmount) }}</td>
+                                    <td>{{ campaign.endDate | date:'mediumDate' }}</td>
+                                    <td class="actions">
+                                        <button class="btn btn-success btn-sm" (click)="onApproveCampaign(campaign.id)" title="Approve">
+                                            ✓ Approve
+                                        </button>
+                                        <button class="btn btn-danger btn-sm" (click)="onRejectCampaign(campaign.id)" title="Reject">
+                                            ✗ Reject
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Active Campaigns -->
+                <div *ngIf="!isCampaignsLoading && campaignTab === 'active'">
+                    <div *ngIf="activeCampaigns.length === 0" class="empty-state">
+                        <p>No active campaigns</p>
+                    </div>
+
+                    <div *ngIf="activeCampaigns.length > 0" class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Title</th>
+                                    <th>Category</th>
+                                    <th>Association</th>
+                                    <th>Progress</th>
+                                    <th>Target</th>
+                                    <th>End Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let campaign of activeCampaigns">
+                                    <td>{{ campaign.id }}</td>
+                                    <td><strong>{{ campaign.title }}</strong></td>
+                                    <td><span class="category-badge">{{ getCategoryName(campaign.category) }}</span></td>
+                                    <td>{{ getAssociationDisplayName(campaign) }}</td>
+                                    <td>
+                                        <div class="progress-mini">
+                                            <div class="progress-bar-mini">
+                                                <div class="progress-fill-mini" 
+                                                     [style.width.%]="(campaign.collectedAmount / campaign.targetAmount) * 100"></div>
+                                            </div>
+                                            <span>{{ ((campaign.collectedAmount / campaign.targetAmount) * 100) | number:'1.0-0' }}%</span>
+                                        </div>
+                                    </td>
+                                    <td>{{ formatCurrency(campaign.targetAmount) }}</td>
+                                    <td>{{ campaign.endDate | date:'mediumDate' }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
 
             <!-- Comments Management -->
@@ -178,3 +284,26 @@
         </div>
     </main>
 </div>
+
+<!-- Alert Modal -->
+<app-alert-modal
+    [isOpen]="alertModal.isOpen"
+    [title]="alertModal.title"
+    [message]="alertModal.message"
+    [type]="alertModal.type"
+    (closed)="closeAlert()">
+</app-alert-modal>
+
+<!-- Confirmation Modal -->
+<app-alert-modal
+    [isOpen]="confirmModal.isOpen"
+    [title]="confirmModal.title"
+    [message]="confirmModal.message"
+    type="warning"
+    [showCancel]="true"
+    confirmText="Yes, proceed"
+    cancelText="Cancel"
+    (confirmed)="onConfirmAction()"
+    (cancelled)="closeConfirm()"
+    (closed)="closeConfirm()">
+</app-alert-modal>

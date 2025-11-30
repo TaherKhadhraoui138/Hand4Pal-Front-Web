@@ -1,65 +1,71 @@
-<!-- Loading state -->
-<div *ngIf="isLoading" class="loading-container">
-    <div class="loading-spinner"></div>
-    <p>Loading campaign...</p>
-</div>
+<!-- Use async pipes with combined state for better change detection -->
+<ng-container *ngIf="{ loading: isLoading$ | async, error: error$ | async, campaign: campaign$ | async } as state">
+    <!-- Loading state -->
+    <div *ngIf="state.loading" class="loading-container">
+        <div class="loading-spinner"></div>
+        <p>Loading campaign...</p>
+    </div>
 
-<!-- Campaign details -->
-<div *ngIf="!isLoading && campaign" class="details-container">
-    <div class="container">
-        <div class="details-grid">
-            <!-- Left Column: Content -->
-            <div class="main-content">
-                <div class="campaign-image">
-                    <img 
-                        *ngIf="campaign.imageUrl" 
-                        [src]="campaign.imageUrl" 
-                        [alt]="campaign.title"
-                        class="campaign-img"
-                    />
-                    <div *ngIf="!campaign.imageUrl" class="image-placeholder">{{ categoryEmoji }}</div>
-                </div>
+    <!-- Error state -->
+    <div *ngIf="!state.loading && state.error" class="error-container">
+        <div class="error-state">
+            <div class="error-icon">⚠️</div>
+            <h3>Oops! Something went wrong</h3>
+            <p>{{ state.error }}</p>
+            <button class="btn btn-primary" (click)="retryLoad()">Try Again</button>
+        </div>
+    </div>
 
-                <div class="campaign-header">
-                    <span class="category-badge">{{ categoryName }}</span>
-                    <h1>{{ campaign.title }}</h1>
-                    <div class="campaign-meta">
-                        <div class="organizer">
-                            <div class="avatar">
-                                <img 
-                                    *ngIf="campaign.organizerAvatar" 
-                                    [src]="campaign.organizerAvatar" 
-                                    [alt]="campaign.organizerName"
-                                />
-                            </div>
-                            <span>Organized by <strong>{{ campaign.organizerName }}</strong></span>
-                        </div>
-                        <span class="date">{{ getRelativeTime(campaign.createdAt) }}</span>
+    <!-- Campaign details -->
+    <div *ngIf="!state.loading && !state.error && state.campaign" class="details-container">
+        <div class="container">
+            <div class="details-grid">
+                <!-- Left Column: Content -->
+                <div class="main-content">
+                    <div class="campaign-image">
+                        <img 
+                            *ngIf="getCampaignImageUrl(state.campaign)" 
+                            [src]="getCampaignImageUrl(state.campaign)" 
+                            [alt]="state.campaign.title"
+                            class="campaign-img"
+                        />
+                        <div *ngIf="!getCampaignImageUrl(state.campaign)" class="image-placeholder">{{ getCategoryEmoji(state.campaign) }}</div>
                     </div>
-                </div>
 
-                <div class="tabs">
-                    <button 
-                        class="tab-btn" 
-                        [class.active]="activeTab === 'about'"
-                        (click)="setActiveTab('about')"
-                    >About</button>
-                    <button 
-                        class="tab-btn"
-                        [class.active]="activeTab === 'updates'"
-                        (click)="setActiveTab('updates')"
-                    >Updates (3)</button>
-                    <button 
-                        class="tab-btn"
-                        [class.active]="activeTab === 'comments'"
-                        (click)="setActiveTab('comments')"
-                    >Comments</button>
+                    <div class="campaign-header">
+                        <span class="category-badge">{{ getCategoryName(state.campaign) }}</span>
+                        <h1>{{ state.campaign.title }}</h1>
+                        <div class="campaign-meta">
+                            <div class="organizer">
+                                <div class="avatar"></div>
+                                <span>Organized by <strong>{{ getOrganizerName(state.campaign) }}</strong></span>
+                            </div>
+                            <span class="date">{{ getRelativeTime(state.campaign.createdAt) }}</span>
+                        </div>
+                    </div>
+
+                    <div class="tabs">
+                        <button 
+                            class="tab-btn" 
+                            [class.active]="activeTab === 'about'"
+                            (click)="setActiveTab('about')"
+                        >About</button>
+                        <button 
+                            class="tab-btn"
+                            [class.active]="activeTab === 'updates'"
+                            (click)="setActiveTab('updates')"
+                        >Updates (3)</button>
+                        <button 
+                            class="tab-btn"
+                            [class.active]="activeTab === 'comments'"
+                            (click)="setActiveTab('comments')"
+                        >Comments</button>
                 </div>
 
                 <div class="content-body">
                     <!-- About Tab -->
                     <div *ngIf="activeTab === 'about'">
-                        <p>{{ campaign.description }}</p>
+                        <p>{{ state.campaign.description }}</p>
 
                         <h3>Comments</h3>
                         <div class="comments-section">
@@ -106,14 +112,14 @@
                 <div class="donation-card">
                     <div class="progress-section">
                         <div class="amount-display">
-                            <span class="current">{{ formatCurrency(campaign.raisedAmount) }}</span>
-                            <span class="target">raised of {{ formatCurrency(campaign.goalAmount) }} goal</span>
+                            <span class="current">{{ formatCurrency(state.campaign.collectedAmount || 0) }}</span>
+                            <span class="target">raised of {{ formatCurrency(state.campaign.targetAmount) }} goal</span>
                         </div>
                         <div class="progress-bar">
-                            <div class="progress-fill" [style.width.%]="progressPercentage"></div>
+                            <div class="progress-fill" [style.width.%]="getProgressPercentage(state.campaign)"></div>
                         </div>
                         <div class="donor-count">
-                            <strong>{{ progressPercentage | number:'1.0-0' }}%</strong> funded
+                            <strong>{{ getProgressPercentage(state.campaign) | number:'1.0-0' }}%</strong> funded
                         </div>
                     </div>
 
@@ -137,7 +143,8 @@
 
     <app-donation-modal 
         *ngIf="isDonationModalOpen" 
-        [campaignTitle]="campaign.title"
+        [campaignTitle]="state.campaign.title"
         (closeModal)="closeDonationModal()">
     </app-donation-modal>
 </div>
+</ng-container>

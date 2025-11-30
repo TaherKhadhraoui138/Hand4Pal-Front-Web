@@ -4,12 +4,15 @@ import { FormsModule } from '@angular/forms';
 import { UserService } from '../../core/services/user.service';
 import { AdminService } from '../../core/services/admin.service';
 import { AuthService } from '../../core/services/auth.service';
+import { CampaignService } from '../../core/services/campaign.service';
 import { User } from '../../core/models/auth.models';
+import { Campaign, getCategoryDisplayName, getAssociationName } from '../../core/models/campaign.models';
+import { AlertModalComponent, AlertType } from '../../shared/alert-modal/alert-modal.component';
 
 @Component({
     selector: 'app-admin-dashboard',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, AlertModalComponent],
     templateUrl: './admin-dashboard.component.html',
     styleUrls: ['./admin-dashboard.component.css']
 })
@@ -17,18 +20,40 @@ export class AdminDashboardComponent implements OnInit {
     activeTab: string = 'dashboard';
     users: any[] = [];  // Using any[] because API returns userId, not id
     pendingAssociations: any[] = [];
+    activeCampaigns: Campaign[] = [];
+    pendingCampaigns: Campaign[] = [];
+    campaignTab: 'active' | 'pending' = 'pending';
     isLoading = false;
+    isCampaignsLoading = false;
     searchQuery = '';
+
+    // Alert modal state
+    alertModal = {
+        isOpen: false,
+        title: '',
+        message: '',
+        type: 'info' as AlertType
+    };
+
+    // Confirmation modal state
+    confirmModal = {
+        isOpen: false,
+        title: '',
+        message: '',
+        action: null as (() => void) | null
+    };
 
     constructor(
         private userService: UserService,
         private adminService: AdminService,
-        private authService: AuthService
+        private authService: AuthService,
+        private campaignService: CampaignService
     ) { }
 
     ngOnInit(): void {
         this.loadUsers();
         this.loadPendingAssociations();
+        this.loadCampaigns();
     }
 
     loadUsers(): void {
@@ -66,21 +91,21 @@ export class AdminDashboardComponent implements OnInit {
     onDeleteUser(userId: number): void {
         if (!userId) {
             console.error('User ID is undefined!');
-            alert('Cannot delete user: ID is missing');
+            this.showAlert('Error', 'Cannot delete user: ID is missing', 'error');
             return;
         }
-        if (confirm('Are you sure you want to delete this user?')) {
+        this.showConfirm('Delete User', 'Are you sure you want to delete this user?', () => {
             this.userService.deleteUser(userId).subscribe({
                 next: () => {
-                    alert('User deleted successfully!');
-                    window.location.reload();  // Refresh the whole page
+                    this.showAlert('Success', 'User deleted successfully!', 'success');
+                    this.loadUsers();
                 },
                 error: (error) => {
                     console.error('Failed to delete user', error);
-                    alert('Failed to delete user. Please try again.');
+                    this.showAlert('Error', 'Failed to delete user. Please try again.', 'error');
                 }
             });
-        }
+        });
     }
 
     // Association Management
@@ -99,40 +124,147 @@ export class AdminDashboardComponent implements OnInit {
     }
 
     onApproveAssociation(id: number): void {
-        if (confirm('Are you sure you want to approve this association?')) {
+        this.showConfirm('Approve Association', 'Are you sure you want to approve this association?', () => {
             this.adminService.approveAssociation(id).subscribe({
                 next: () => {
                     this.pendingAssociations = this.pendingAssociations.filter(a => a.id !== id);
-                    alert('Association approved successfully!');
+                    this.showAlert('Success', 'Association approved successfully!', 'success');
                 },
                 error: (error) => {
                     console.error('Failed to approve association', error);
                     if (error.status === 403) {
-                        alert('Access denied. Please make sure you are logged in as an administrator.');
+                        this.showAlert('Access Denied', 'Please make sure you are logged in as an administrator.', 'error');
                     } else {
-                        alert('Failed to approve association. Please try again.');
+                        this.showAlert('Error', 'Failed to approve association. Please try again.', 'error');
                     }
                 }
             });
-        }
+        });
     }
 
     onRejectAssociation(id: number): void {
-        if (confirm('Are you sure you want to reject this association?')) {
+        this.showConfirm('Reject Association', 'Are you sure you want to reject this association?', () => {
             this.adminService.rejectAssociation(id).subscribe({
                 next: () => {
                     this.pendingAssociations = this.pendingAssociations.filter(a => a.id !== id);
-                    alert('Association rejected successfully!');
+                    this.showAlert('Success', 'Association rejected successfully!', 'success');
                 },
                 error: (error) => {
                     console.error('Failed to reject association', error);
                     if (error.status === 403) {
-                        alert('Access denied. Please make sure you are logged in as an administrator.');
+                        this.showAlert('Access Denied', 'Please make sure you are logged in as an administrator.', 'error');
                     } else {
-                        alert('Failed to reject association. Please try again.');
+                        this.showAlert('Error', 'Failed to reject association. Please try again.', 'error');
                     }
                 }
             });
+        });
+    }
+
+    // Campaign Management
+    loadCampaigns(): void {
+        this.isCampaignsLoading = true;
+        
+        // Load active campaigns
+        this.campaignService.getActiveCampaigns().subscribe({
+            next: (data) => {
+                this.activeCampaigns = data;
+            },
+            error: (error) => {
+                console.error('Failed to load active campaigns', error);
+            }
+        });
+
+        // Load pending campaigns
+        this.campaignService.getPendingCampaigns().subscribe({
+            next: (data) => {
+                this.pendingCampaigns = data;
+                this.isCampaignsLoading = false;
+            },
+            error: (error) => {
+                console.error('Failed to load pending campaigns', error);
+                this.isCampaignsLoading = false;
+            }
+        });
+    }
+
+    onApproveCampaign(id: number): void {
+        this.showConfirm('Approve Campaign', 'Are you sure you want to approve this campaign?', () => {
+            this.campaignService.approveCampaign(id).subscribe({
+                next: (approvedCampaign) => {
+                    this.pendingCampaigns = this.pendingCampaigns.filter(c => c.id !== id);
+                    this.activeCampaigns.push(approvedCampaign);
+                    this.showAlert('Success', 'Campaign approved successfully!', 'success');
+                },
+                error: (error) => {
+                    console.error('Failed to approve campaign', error);
+                    if (error.status === 403) {
+                        this.showAlert('Access Denied', 'Please make sure you are logged in as an administrator.', 'error');
+                    } else {
+                        this.showAlert('Error', 'Failed to approve campaign. Please try again.', 'error');
+                    }
+                }
+            });
+        });
+    }
+
+    onRejectCampaign(id: number): void {
+        this.showConfirm('Reject Campaign', 'Are you sure you want to reject this campaign?', () => {
+            this.campaignService.rejectCampaign(id).subscribe({
+                next: () => {
+                    this.pendingCampaigns = this.pendingCampaigns.filter(c => c.id !== id);
+                    this.showAlert('Success', 'Campaign rejected successfully!', 'success');
+                },
+                error: (error) => {
+                    console.error('Failed to reject campaign', error);
+                    if (error.status === 403) {
+                        this.showAlert('Access Denied', 'Please make sure you are logged in as an administrator.', 'error');
+                    } else {
+                        this.showAlert('Error', 'Failed to reject campaign. Please try again.', 'error');
+                    }
+                }
+            });
+        });
+    }
+
+    getCategoryName(category: string): string {
+        return getCategoryDisplayName(category as any);
+    }
+
+    getAssociationDisplayName(campaign: Campaign): string {
+        return getAssociationName(campaign);
+    }
+
+    formatCurrency(amount: number): string {
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 0
+        }).format(amount);
+    }
+
+    // Alert modal helpers
+    showAlert(title: string, message: string, type: AlertType): void {
+        this.alertModal = { isOpen: true, title, message, type };
+    }
+
+    closeAlert(): void {
+        this.alertModal.isOpen = false;
+    }
+
+    showConfirm(title: string, message: string, action: () => void): void {
+        this.confirmModal = { isOpen: true, title, message, action };
+    }
+
+    closeConfirm(): void {
+        this.confirmModal.isOpen = false;
+        this.confirmModal.action = null;
+    }
+
+    onConfirmAction(): void {
+        if (this.confirmModal.action) {
+            this.confirmModal.action();
         }
+        this.closeConfirm();
     }
 }

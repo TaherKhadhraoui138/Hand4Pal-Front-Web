@@ -1,5 +1,5 @@
 /**
- * Campaign model interfaces
+ * Campaign model interfaces - Matching backend Campaign entity
  */
 
 export interface Campaign {
@@ -7,46 +7,86 @@ export interface Campaign {
     title: string;
     description: string;
     category: CampaignCategory;
-    goalAmount: number;
-    raisedAmount: number;
-    imageUrl?: string;
-    organizerName: string;
-    organizerAvatar?: string;
-    createdAt?: Date;
-    endDate?: Date;
+    targetAmount: number;      // Backend uses targetAmount
+    collectedAmount: number;   // Backend uses collectedAmount
+    imageUrl?: string;         // Frontend naming convention
+    imageURL?: string;         // Backend Java naming convention (column name)
+    associationId?: number;    // Backend links to association
+    associationName?: string;  // Direct field if backend provides it
+    association?: {            // Nested association object from backend
+        id: number;
+        associationName?: string;
+        name?: string;
+        email?: string;
+    };
+    createdAt?: string;
+    endDate?: string;
     status: CampaignStatus;
 }
 
+/**
+ * Helper to get campaign image URL (handles both naming conventions)
+ */
+export function getCampaignImageUrl(campaign: Campaign): string | null {
+    return campaign.imageUrl || campaign.imageURL || null;
+}
+
+/**
+ * Helper to get association name from campaign
+ * Note: Backend currently only returns associationId, not the name.
+ * Ideally the backend should be updated to include associationName in the response.
+ */
+export function getAssociationName(campaign: Campaign): string {
+    // Try different possible field names from backend
+    if (campaign.associationName) {
+        return campaign.associationName;
+    }
+    if (campaign.association?.associationName) {
+        return campaign.association.associationName;
+    }
+    if (campaign.association?.name) {
+        return campaign.association.name;
+    }
+    // Fallback: show association ID if available
+    if (campaign.associationId) {
+        return `Association #${campaign.associationId}`;
+    }
+    return 'Unknown';
+}
+
 export type CampaignCategory = 
-    | 'MEDICAL_AID' 
-    | 'FOOD_WATER' 
+    | 'HEALTH' 
     | 'EDUCATION' 
-    | 'RECONSTRUCTION' 
+    | 'ENVIRONMENT' 
+    | 'ANIMAL_WELFARE' 
+    | 'SOCIAL'
     | 'EMERGENCY' 
     | 'OTHER';
 
 export type CampaignStatus = 
     | 'ACTIVE' 
+    | 'APPROVED'
     | 'COMPLETED' 
     | 'PENDING' 
-    | 'CANCELLED';
+    | 'REJECTED';
 
 export interface CampaignCreateRequest {
     title: string;
     description: string;
     category: CampaignCategory;
-    goalAmount: number;
+    targetAmount: number;
+    endDate: string;  // Required - format: YYYY-MM-DD or ISO datetime
     imageUrl?: string;
-    endDate?: Date;
 }
 
 export interface CampaignUpdateRequest {
     title?: string;
     description?: string;
     category?: CampaignCategory;
-    goalAmount?: number;
+    targetAmount?: number;
+    collectedAmount?: number;
     imageUrl?: string;
-    endDate?: Date;
+    endDate?: string;
 }
 
 /**
@@ -54,10 +94,11 @@ export interface CampaignUpdateRequest {
  */
 export function getCategoryDisplayName(category: CampaignCategory): string {
     const categoryNames: Record<CampaignCategory, string> = {
-        'MEDICAL_AID': 'Medical Aid',
-        'FOOD_WATER': 'Food & Water',
+        'HEALTH': 'Health',
         'EDUCATION': 'Education',
-        'RECONSTRUCTION': 'Reconstruction',
+        'ENVIRONMENT': 'Environment',
+        'ANIMAL_WELFARE': 'Animal Welfare',
+        'SOCIAL': 'Social',
         'EMERGENCY': 'Emergency',
         'OTHER': 'Other'
     };
@@ -69,10 +110,11 @@ export function getCategoryDisplayName(category: CampaignCategory): string {
  */
 export function getCategoryEmoji(category: CampaignCategory): string {
     const categoryEmojis: Record<CampaignCategory, string> = {
-        'MEDICAL_AID': '🏥',
-        'FOOD_WATER': '🍞',
+        'HEALTH': '🏥',
         'EDUCATION': '📚',
-        'RECONSTRUCTION': '🏗️',
+        'ENVIRONMENT': '🌍',
+        'ANIMAL_WELFARE': '🐾',
+        'SOCIAL': '🤝',
         'EMERGENCY': '🚨',
         'OTHER': '💝'
     };

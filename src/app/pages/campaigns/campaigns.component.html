@@ -17,18 +17,35 @@
         </button>
     </div>
 
-    <div class="campaigns-grid">
-        <app-campaign-card
-            *ngFor="let campaign of filteredCampaigns"
-            [campaign]="campaign"
-            (donate)="onDonate($event)"
-        ></app-campaign-card>
-    </div>
+    <!-- Loading state -->
+    <ng-container *ngIf="{ loading: isLoading$ | async, error: error$ | async, campaigns: filteredCampaigns$ | async } as state">
+        <div *ngIf="state.loading" class="loading-container">
+            <div class="loading-spinner"></div>
+            <p>Loading campaigns...</p>
+        </div>
 
-    <!-- Empty state -->
-    <div *ngIf="filteredCampaigns.length === 0" class="empty-state">
-        <div class="empty-icon">📭</div>
-        <h3>No campaigns found</h3>
-        <p>There are no campaigns in this category at the moment.</p>
-    </div>
+        <!-- Error state -->
+        <div *ngIf="state.error && !state.loading" class="error-state">
+            <div class="error-icon">⚠️</div>
+            <h3>Oops! Something went wrong</h3>
+            <p>{{ state.error }}</p>
+            <button class="btn btn-primary" (click)="campaignViewModel.loadActiveCampaigns()">Try Again</button>
+        </div>
+
+        <!-- Campaigns grid -->
+        <div *ngIf="!state.loading && !state.error" class="campaigns-grid">
+            <app-campaign-card
+                *ngFor="let campaign of state.campaigns"
+                [campaign]="campaign"
+                (donate)="onDonate($event)"
+            ></app-campaign-card>
+        </div>
+
+        <!-- Empty state -->
+        <div *ngIf="!state.loading && !state.error && state.campaigns?.length === 0" class="empty-state">
+            <div class="empty-icon">📭</div>
+            <h3>No campaigns found</h3>
+            <p>There are no campaigns in this category at the moment.</p>
+        </div>
+    </ng-container>
 </div>
