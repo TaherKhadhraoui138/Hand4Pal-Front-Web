@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { Subject } from 'rxjs';
 import { DonationModalComponent } from '../../shared/donation-modal/donation-modal.component';
 import { CommentComponent } from '../../shared/comment/comment.component';
-import { Campaign, getCategoryDisplayName, getCategoryEmoji } from '../../core/models/campaign.models';
+import { Campaign, getCategoryDisplayName, getCategoryEmoji, getAssociationName, getCampaignImageUrl } from '../../core/models/campaign.models';
 import { CampaignViewModel } from '../../core/viewmodels/campaign.viewmodel';
 
 @Component({
@@ -61,10 +61,17 @@ export class CampaignDetailsComponent implements OnInit, OnDestroy {
     }
 
     /**
+     * Get campaign image URL (handles both naming conventions)
+     */
+    getCampaignImageUrl(campaign: Campaign): string | null {
+        return getCampaignImageUrl(campaign);
+    }
+
+    /**
      * Get association name
      */
     getOrganizerName(campaign: Campaign): string {
-        return campaign.associationName || 'Anonymous';
+        return getAssociationName(campaign);
     }
 
     /**

@@ -597,3 +597,75 @@
 .text-muted {
     color: var(--light-text);
 }
+
+/* Campaign Tabs */
+.campaign-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 0.5rem;
+}
+
+.campaign-tabs .tab-btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+    font-weight: 500;
+    color: var(--light-text);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.campaign-tabs .tab-btn:hover {
+    color: var(--primary-color);
+    background: rgba(0, 166, 81, 0.05);
+}
+
+.campaign-tabs .tab-btn.active {
+    color: var(--primary-color);
+    background: rgba(0, 166, 81, 0.1);
+    border-bottom: 2px solid var(--primary-color);
+}
+
+/* Category Badge */
+.category-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 500;
+    background: #e0f2fe;
+    color: #0369a1;
+}
+
+/* Progress Mini */
+.progress-mini {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.progress-bar-mini {
+    flex: 1;
+    height: 8px;
+    background: #e2e8f0;
+    border-radius: var(--radius-full);
+    overflow: hidden;
+    min-width: 60px;
+}
+
+.progress-fill-mini {
+    height: 100%;
+    background: var(--primary-color);
+    border-radius: var(--radius-full);
+    transition: width 0.3s ease;
+}
+
+.progress-mini span {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--light-text);
+    min-width: 35px;
+}

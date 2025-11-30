@@ -1,0 +1,19 @@
+<div *ngIf="isOpen" class="modal-overlay" (click)="onOverlayClick()">
+    <div class="modal-content" [class]="type" (click)="$event.stopPropagation()">
+        <div class="modal-icon">{{ icon }}</div>
+        <h3 class="modal-title">{{ title }}</h3>
+        <p class="modal-message">{{ message }}</p>
+        <div class="modal-actions">
+            <button *ngIf="showCancel" class="btn btn-outline" (click)="onCancel()">
+                {{ cancelText }}
+            </button>
+            <button class="btn" [class.btn-success]="type === 'success'" 
+                    [class.btn-error]="type === 'error'"
+                    [class.btn-warning]="type === 'warning'"
+                    [class.btn-primary]="type === 'info'"
+                    (click)="onConfirm()">
+                {{ confirmText }}
+            </button>
+        </div>
+    </div>
+</div>

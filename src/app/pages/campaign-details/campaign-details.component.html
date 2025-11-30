@@ -24,12 +24,12 @@
                 <div class="main-content">
                     <div class="campaign-image">
                         <img 
-                            *ngIf="state.campaign.imageUrl" 
-                            [src]="state.campaign.imageUrl" 
+                            *ngIf="getCampaignImageUrl(state.campaign)" 
+                            [src]="getCampaignImageUrl(state.campaign)" 
                             [alt]="state.campaign.title"
                             class="campaign-img"
                         />
-                        <div *ngIf="!state.campaign.imageUrl" class="image-placeholder">{{ getCategoryEmoji(state.campaign) }}</div>
+                        <div *ngIf="!getCampaignImageUrl(state.campaign)" class="image-placeholder">{{ getCategoryEmoji(state.campaign) }}</div>
                     </div>
 
                     <div class="campaign-header">

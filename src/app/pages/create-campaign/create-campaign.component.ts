@@ -22,10 +22,11 @@ export class CreateCampaign implements OnInit, OnDestroy {
     success: string | null = null;
 
     categories: { label: string; value: CampaignCategory }[] = [
-        { label: 'Medical Aid', value: 'MEDICAL_AID' },
-        { label: 'Food & Water', value: 'FOOD_WATER' },
+        { label: 'Health', value: 'HEALTH' },
         { label: 'Education', value: 'EDUCATION' },
-        { label: 'Reconstruction', value: 'RECONSTRUCTION' },
+        { label: 'Environment', value: 'ENVIRONMENT' },
+        { label: 'Animal Welfare', value: 'ANIMAL_WELFARE' },
+        { label: 'Social', value: 'SOCIAL' },
         { label: 'Emergency', value: 'EMERGENCY' },
         { label: 'Other', value: 'OTHER' }
     ];
@@ -88,12 +89,17 @@ export class CreateCampaign implements OnInit, OnDestroy {
         }
 
         const formValue = this.campaignForm.value;
+        
+        // Format endDate as ISO datetime string (backend expects LocalDateTime)
+        const endDateValue = formValue.endDate;
+        const endDateFormatted = endDateValue ? `${endDateValue}T23:59:59` : '';
+        
         const campaignData: CampaignCreateRequest = {
             title: formValue.title,
             description: formValue.description,
             category: formValue.category,
-            targetAmount: formValue.targetAmount,
-            endDate: formValue.endDate,
+            targetAmount: Number(formValue.targetAmount),
+            endDate: endDateFormatted,
             imageUrl: formValue.imageUrl || undefined
         };
 

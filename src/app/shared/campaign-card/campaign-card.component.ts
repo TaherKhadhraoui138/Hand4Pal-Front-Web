@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { Campaign, getCategoryDisplayName, getCategoryEmoji } from '../../core/models/campaign.models';
+import { Campaign, getCategoryDisplayName, getCategoryEmoji, getAssociationName, getCampaignImageUrl } from '../../core/models/campaign.models';
 
 @Component({
     selector: 'app-campaign-card',
@@ -43,7 +43,7 @@ export class CampaignCardComponent {
      * Get association name
      */
     get organizerName(): string {
-        return this.campaign.associationName || 'Anonymous';
+        return getAssociationName(this.campaign);
     }
 
     /**
@@ -58,6 +58,13 @@ export class CampaignCardComponent {
      */
     get categoryEmoji(): string {
         return getCategoryEmoji(this.campaign.category);
+    }
+
+    /**
+     * Get campaign image URL (handles both naming conventions)
+     */
+    get campaignImageUrl(): string | null {
+        return getCampaignImageUrl(this.campaign);
     }
 
     /**

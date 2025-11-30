@@ -3,12 +3,12 @@
         <div class="card-image">
             <div class="category-tag">{{ categoryName }}</div>
             <img 
-                *ngIf="campaign.imageUrl" 
-                [src]="campaign.imageUrl" 
+                *ngIf="campaignImageUrl" 
+                [src]="campaignImageUrl" 
                 [alt]="campaign.title"
                 class="campaign-image"
             />
-            <div *ngIf="!campaign.imageUrl" class="image-placeholder">
+            <div *ngIf="!campaignImageUrl" class="image-placeholder">
                 {{ categoryEmoji }}
             </div>
         </div>

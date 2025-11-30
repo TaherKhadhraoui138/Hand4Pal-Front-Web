@@ -24,22 +24,22 @@ export class CampaignService {
     }
 
     /**
-     * Get all active campaigns (public)
-     * GET /campaigns/active
+     * Get all active campaigns with association details (public)
+     * GET /campaigns/active/with-association
      */
     getActiveCampaigns(): Observable<Campaign[]> {
-        return this.http.get<Campaign[]>(`${this.API_URL}/active`).pipe(
+        return this.http.get<Campaign[]>(`${this.API_URL}/active/with-association`).pipe(
             timeout(this.TIMEOUT_MS),
             catchError(this.handleTimeout)
         );
     }
 
     /**
-     * Get campaign by ID (public)
-     * GET /campaigns/:id
+     * Get campaign by ID with association details (public)
+     * GET /campaigns/:id/with-association
      */
     getCampaignById(campaignId: number): Observable<Campaign> {
-        return this.http.get<Campaign>(`${this.API_URL}/${campaignId}`).pipe(
+        return this.http.get<Campaign>(`${this.API_URL}/${campaignId}/with-association`).pipe(
             timeout(this.TIMEOUT_MS),
             catchError(this.handleTimeout)
         );
@@ -68,22 +68,22 @@ export class CampaignService {
     }
 
     /**
-     * Get pending campaigns (Admin only)
-     * GET /campaigns/pending
+     * Get pending campaigns with association details (Admin only)
+     * GET /campaigns/pending/with-association
      */
     getPendingCampaigns(): Observable<Campaign[]> {
-        return this.http.get<Campaign[]>(`${this.API_URL}/pending`).pipe(
+        return this.http.get<Campaign[]>(`${this.API_URL}/pending/with-association`).pipe(
             timeout(this.TIMEOUT_MS),
             catchError(this.handleTimeout)
         );
     }
 
     /**
-     * Get my campaigns (Association - current user's campaigns)
-     * GET /campaigns/my-campaigns
+     * Get my campaigns with association details (Association - current user's campaigns)
+     * GET /campaigns/my-campaigns/with-association
      */
     getMyCampaigns(): Observable<Campaign[]> {
-        return this.http.get<Campaign[]>(`${this.API_URL}/my-campaigns`).pipe(
+        return this.http.get<Campaign[]>(`${this.API_URL}/my-campaigns/with-association`).pipe(
             timeout(this.TIMEOUT_MS),
             catchError(this.handleTimeout)
         );

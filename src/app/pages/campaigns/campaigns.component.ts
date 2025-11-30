@@ -29,10 +29,13 @@ export class CampaignsComponent implements OnInit, OnDestroy {
 
     filters: { label: string; value: CampaignCategory | 'ALL' }[] = [
         { label: 'All', value: 'ALL' },
-        { label: 'Medical Aid', value: 'MEDICAL_AID' },
-        { label: 'Food & Water', value: 'FOOD_WATER' },
+        { label: 'Health', value: 'HEALTH' },
         { label: 'Education', value: 'EDUCATION' },
-        { label: 'Reconstruction', value: 'RECONSTRUCTION' }
+        { label: 'Environment', value: 'ENVIRONMENT' },
+        { label: 'Animal Welfare', value: 'ANIMAL_WELFARE' },
+        { label: 'Social', value: 'SOCIAL' },
+        { label: 'Emergency', value: 'EMERGENCY' },
+        { label: 'Other', value: 'OTHER' }
     ];
 
     ngOnInit(): void {
