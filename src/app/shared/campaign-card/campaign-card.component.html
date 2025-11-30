@@ -25,21 +25,15 @@
                     ></div>
                 </div>
                 <div class="progress-stats">
-                    <span class="raised">{{ formattedRaisedAmount }} raised</span>
-                    <span class="goal">of {{ formattedGoalAmount }}</span>
+                    <span class="raised">{{ formattedCollectedAmount }} raised</span>
+                    <span class="goal">of {{ formattedTargetAmount }}</span>
                 </div>
             </div>
 
             <div class="card-footer">
                 <div class="organizer">
-                    <div class="avatar">
-                        <img 
-                            *ngIf="campaign.organizerAvatar" 
-                            [src]="campaign.organizerAvatar" 
-                            [alt]="campaign.organizerName"
-                        />
-                    </div>
-                    <span>By {{ campaign.organizerName }}</span>
+                    <div class="avatar"></div>
+                    <span>By {{ organizerName }}</span>
                 </div>
                 <button 
                     class="btn btn-primary btn-sm" 

@@ -1,5 +1,5 @@
 /**
- * Campaign model interfaces
+ * Campaign model interfaces - Matching backend Campaign entity
  */
 
 export interface Campaign {
@@ -7,13 +7,13 @@ export interface Campaign {
     title: string;
     description: string;
     category: CampaignCategory;
-    goalAmount: number;
-    raisedAmount: number;
+    targetAmount: number;      // Backend uses targetAmount
+    collectedAmount: number;   // Backend uses collectedAmount
     imageUrl?: string;
-    organizerName: string;
-    organizerAvatar?: string;
-    createdAt?: Date;
-    endDate?: Date;
+    associationId: number;     // Backend links to association
+    associationName?: string;  // Populated from backend
+    createdAt?: string;
+    endDate?: string;
     status: CampaignStatus;
 }
 
@@ -29,24 +29,25 @@ export type CampaignStatus =
     | 'ACTIVE' 
     | 'COMPLETED' 
     | 'PENDING' 
-    | 'CANCELLED';
+    | 'REJECTED';
 
 export interface CampaignCreateRequest {
     title: string;
     description: string;
     category: CampaignCategory;
-    goalAmount: number;
+    targetAmount: number;
     imageUrl?: string;
-    endDate?: Date;
+    endDate?: string;
 }
 
 export interface CampaignUpdateRequest {
     title?: string;
     description?: string;
     category?: CampaignCategory;
-    goalAmount?: number;
+    targetAmount?: number;
+    collectedAmount?: number;
     imageUrl?: string;
-    endDate?: Date;
+    endDate?: string;
 }
 
 /**

@@ -1,79 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { Subject } from 'rxjs';
 import { DonationModalComponent } from '../../shared/donation-modal/donation-modal.component';
 import { CommentComponent } from '../../shared/comment/comment.component';
 import { Campaign, getCategoryDisplayName, getCategoryEmoji } from '../../core/models/campaign.models';
-
-// Mock data for development
-const MOCK_CAMPAIGNS: Campaign[] = [
-    {
-        id: 1,
-        title: 'Emergency Medical Supplies for Gaza Hospitals',
-        description: 'Hospitals in Gaza are facing critical shortages of essential medicines, surgical supplies, and fuel. This campaign aims to provide immediate relief by delivering anesthesia and surgical kits, antibiotics and painkillers, emergency trauma supplies, and fuel for hospital generators. Every donation, no matter how small, helps save lives. We are working directly with local partners to ensure aid reaches those who need it most effectively and transparently.',
-        category: 'MEDICAL_AID',
-        goalAmount: 100000,
-        raisedAmount: 75000,
-        organizerName: 'Dr. Sarah Smith',
-        status: 'ACTIVE',
-        createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
-    },
-    {
-        id: 2,
-        title: 'Food Distribution for Displaced Families',
-        description: 'Providing essential food packages to families who have lost their homes and livelihoods. Each package contains rice, flour, cooking oil, canned goods, and other essentials to sustain a family for two weeks. We are committed to reaching the most vulnerable populations in affected areas.',
-        category: 'FOOD_WATER',
-        goalAmount: 50000,
-        raisedAmount: 32000,
-        organizerName: 'Aid Foundation',
-        status: 'ACTIVE',
-        createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000)
-    },
-    {
-        id: 3,
-        title: 'School Rebuilding Project',
-        description: 'Help rebuild schools destroyed by conflict so children can continue their education. Education is a fundamental right, and we are determined to restore learning spaces for thousands of children. Your support will fund construction materials, furniture, and educational supplies.',
-        category: 'EDUCATION',
-        goalAmount: 200000,
-        raisedAmount: 89000,
-        organizerName: 'Education For All',
-        status: 'ACTIVE',
-        createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000)
-    },
-    {
-        id: 4,
-        title: 'Clean Water Initiative',
-        description: 'Installing water purification systems to provide clean drinking water to communities. Access to clean water is essential for health and survival. Our initiative focuses on sustainable solutions that will serve communities for years to come.',
-        category: 'FOOD_WATER',
-        goalAmount: 75000,
-        raisedAmount: 45000,
-        organizerName: 'Water Aid',
-        status: 'ACTIVE',
-        createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-    },
-    {
-        id: 5,
-        title: 'Hospital Equipment Fund',
-        description: 'Purchasing essential medical equipment for understaffed and under-resourced hospitals. This includes ventilators, monitoring systems, surgical tools, and diagnostic equipment that are desperately needed to save lives.',
-        category: 'MEDICAL_AID',
-        goalAmount: 150000,
-        raisedAmount: 112000,
-        organizerName: 'Medical Relief Org',
-        status: 'ACTIVE',
-        createdAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000)
-    },
-    {
-        id: 6,
-        title: 'Housing Reconstruction Program',
-        description: 'Helping families rebuild their homes and restore dignity after displacement. Our program provides building materials, skilled labor support, and coordination with local authorities to ensure safe and sustainable housing solutions.',
-        category: 'RECONSTRUCTION',
-        goalAmount: 300000,
-        raisedAmount: 156000,
-        organizerName: 'Shelter Now',
-        status: 'ACTIVE',
-        createdAt: new Date(Date.now() - 21 * 24 * 60 * 60 * 1000)
-    }
-];
+import { CampaignViewModel } from '../../core/viewmodels/campaign.viewmodel';
 
 @Component({
     selector: 'app-campaign-details',
@@ -82,49 +14,65 @@ const MOCK_CAMPAIGNS: Campaign[] = [
     templateUrl: './campaign-details.component.html',
     styleUrls: ['./campaign-details.component.css']
 })
-export class CampaignDetailsComponent implements OnInit {
-    campaign: Campaign | null = null;
+export class CampaignDetailsComponent implements OnInit, OnDestroy {
+    private destroy$ = new Subject<void>();
+    private route = inject(ActivatedRoute);
+    private router = inject(Router);
+    public campaignViewModel = inject(CampaignViewModel);
+    
+    // Use observables directly with async pipe for better change detection
+    campaign$ = this.campaignViewModel.currentCampaign$;
+    isLoading$ = this.campaignViewModel.loading$;
+    error$ = this.campaignViewModel.error$;
+    
+    // Local UI state
     isDonationModalOpen = false;
     activeTab: 'about' | 'updates' | 'comments' = 'about';
-    isLoading = true;
-
-    constructor(
-        private route: ActivatedRoute,
-        private router: Router
-    ) {}
 
     ngOnInit(): void {
+        // Get campaign ID from route and load
         const campaignId = this.route.snapshot.paramMap.get('id');
-        console.log('Campaign ID from route:', campaignId);
-        
         if (campaignId) {
-            this.loadCampaign(+campaignId);
+            this.campaignViewModel.loadCampaignById(+campaignId);
         } else {
-            this.isLoading = false;
             this.router.navigate(['/campaigns']);
         }
+    }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+        // Clear current campaign when leaving the page
+        this.campaignViewModel.clearCurrentCampaign();
     }
 
     /**
      * Get category display name
      */
-    get categoryName(): string {
-        return this.campaign ? getCategoryDisplayName(this.campaign.category) : '';
+    getCategoryName(campaign: Campaign): string {
+        return getCategoryDisplayName(campaign.category);
     }
 
     /**
      * Get category emoji
      */
-    get categoryEmoji(): string {
-        return this.campaign ? getCategoryEmoji(this.campaign.category) : '💝';
+    getCategoryEmoji(campaign: Campaign): string {
+        return getCategoryEmoji(campaign.category);
+    }
+
+    /**
+     * Get association name
+     */
+    getOrganizerName(campaign: Campaign): string {
+        return campaign.associationName || 'Anonymous';
     }
 
     /**
      * Calculate progress percentage
      */
-    get progressPercentage(): number {
-        if (!this.campaign || !this.campaign.goalAmount) return 0;
-        return Math.min((this.campaign.raisedAmount / this.campaign.goalAmount) * 100, 100);
+    getProgressPercentage(campaign: Campaign): number {
+        if (!campaign.targetAmount) return 0;
+        return Math.min((campaign.collectedAmount / campaign.targetAmount) * 100, 100);
     }
 
     /**
@@ -155,29 +103,22 @@ export class CampaignDetailsComponent implements OnInit {
     }
 
     /**
-     * Load campaign by ID
-     * TODO: Replace with CampaignService.getCampaignById()
+     * Retry loading campaign
      */
-    private loadCampaign(id: number): void {
-        console.log('Loading campaign with ID:', id);
-        
-        // Find campaign from mock data (synchronously for now)
-        this.campaign = MOCK_CAMPAIGNS.find(c => c.id === id) || null;
-        this.isLoading = false;
-        
-        console.log('Campaign found:', this.campaign);
-
-        if (!this.campaign) {
-            this.router.navigate(['/campaigns']);
+    retryLoad(): void {
+        const campaignId = this.route.snapshot.paramMap.get('id');
+        if (campaignId) {
+            this.campaignViewModel.loadCampaignById(+campaignId);
         }
     }
 
     /**
      * Get relative time string
      */
-    getRelativeTime(date?: Date): string {
-        if (!date) return '';
+    getRelativeTime(dateStr?: string): string {
+        if (!dateStr) return '';
         
+        const date = new Date(dateStr);
         const now = new Date();
         const diffMs = now.getTime() - date.getTime();
         const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));

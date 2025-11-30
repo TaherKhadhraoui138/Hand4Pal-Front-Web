@@ -18,25 +18,32 @@ export class CampaignCardComponent {
      * Calculate the progress percentage
      */
     get progressPercentage(): number {
-        if (!this.campaign.goalAmount || this.campaign.goalAmount === 0) {
+        if (!this.campaign.targetAmount || this.campaign.targetAmount === 0) {
             return 0;
         }
-        const percentage = (this.campaign.raisedAmount / this.campaign.goalAmount) * 100;
+        const percentage = (this.campaign.collectedAmount / this.campaign.targetAmount) * 100;
         return Math.min(percentage, 100); // Cap at 100%
     }
 
     /**
-     * Get formatted raised amount
+     * Get formatted collected amount
      */
-    get formattedRaisedAmount(): string {
-        return this.formatCurrency(this.campaign.raisedAmount);
+    get formattedCollectedAmount(): string {
+        return this.formatCurrency(this.campaign.collectedAmount || 0);
     }
 
     /**
-     * Get formatted goal amount
+     * Get formatted target amount
      */
-    get formattedGoalAmount(): string {
-        return this.formatCurrency(this.campaign.goalAmount);
+    get formattedTargetAmount(): string {
+        return this.formatCurrency(this.campaign.targetAmount);
+    }
+
+    /**
+     * Get association name
+     */
+    get organizerName(): string {
+        return this.campaign.associationName || 'Anonymous';
     }
 
     /**

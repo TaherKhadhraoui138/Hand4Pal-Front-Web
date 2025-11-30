@@ -5,34 +5,51 @@
                 <h1>Create New Campaign</h1>
                 <p>Launch a new fundraising campaign to support your cause</p>
             </div>
-            <a href="/association-dashboard" class="btn btn-outline">← Back to Dashboard</a>
+            <a routerLink="/association-dashboard" class="btn btn-outline">← Back to Dashboard</a>
+        </div>
+
+        <!-- Success/Error Messages -->
+        <div *ngIf="success" class="alert alert-success">
+            {{ success }}
+        </div>
+        <div *ngIf="error" class="alert alert-error">
+            {{ error }}
         </div>
 
         <div class="form-layout">
             <!-- Main Form -->
             <div class="form-section">
-                <form class="campaign-form">
+                <form class="campaign-form" [formGroup]="campaignForm" (ngSubmit)="onSubmit()">
                     <div class="section-card">
                         <h2>Campaign Details</h2>
 
                         <div class="form-group">
                             <label>Campaign Title <span class="required">*</span></label>
-                            <input type="text" placeholder="e.g., Emergency Medical Aid for Gaza" required>
-                            <span class="helper-text">Choose a clear and compelling title</span>
+                            <input 
+                                type="text" 
+                                formControlName="title"
+                                placeholder="e.g., Emergency Medical Aid for Gaza"
+                                [class.invalid]="title?.invalid && title?.touched"
+                            >
+                            <span class="helper-text">Choose a clear and compelling title (min 10 characters)</span>
+                            <span *ngIf="title?.invalid && title?.touched" class="error-text">
+                                <span *ngIf="title?.errors?.['required']">Title is required</span>
+                                <span *ngIf="title?.errors?.['minlength']">Title must be at least 10 characters</span>
+                            </span>
                         </div>
 
                         <div class="form-group">
                             <label>Category <span class="required">*</span></label>
-                            <select required>
+                            <select 
+                                formControlName="category"
+                                [class.invalid]="category?.invalid && category?.touched"
+                            >
                                 <option value="">Select a category</option>
-                                <option>Emergency Relief</option>
-                                <option>Medical Aid</option>
-                                <option>Education</option>
-                                <option>Clean Water</option>
-                                <option>Food Security</option>
-                                <option>Infrastructure</option>
-                                <option>Other</option>
+                                <option *ngFor="let cat of categories" [value]="cat.value">{{ cat.label }}</option>
                             </select>
+                            <span *ngIf="category?.invalid && category?.touched" class="error-text">
+                                Please select a category
+                            </span>
                         </div>
 
                         <div class="form-row">
@@ -40,104 +57,68 @@
                                 <label>Funding Goal <span class="required">*</span></label>
                                 <div class="input-with-prefix">
                                     <span class="input-prefix">$</span>
-                                    <input type="number" placeholder="10000" min="100" required>
+                                    <input 
+                                        type="number" 
+                                        formControlName="targetAmount"
+                                        placeholder="10000" 
+                                        min="100"
+                                        [class.invalid]="targetAmount?.invalid && targetAmount?.touched"
+                                    >
                                 </div>
+                                <span *ngIf="targetAmount?.invalid && targetAmount?.touched" class="error-text">
+                                    <span *ngIf="targetAmount?.errors?.['required']">Funding goal is required</span>
+                                    <span *ngIf="targetAmount?.errors?.['min']">Minimum goal is $100</span>
+                                </span>
                             </div>
                             <div class="form-group">
                                 <label>End Date <span class="required">*</span></label>
-                                <input type="date" required>
+                                <input 
+                                    type="date" 
+                                    formControlName="endDate"
+                                    [min]="minEndDate"
+                                    [class.invalid]="endDate?.invalid && endDate?.touched"
+                                >
+                                <span *ngIf="endDate?.invalid && endDate?.touched" class="error-text">
+                                    End date is required
+                                </span>
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label>Short Description <span class="required">*</span></label>
-                            <textarea rows="3" placeholder="Brief summary of your campaign (max 200 characters)"
-                                maxlength="200" required></textarea>
-                            <span class="helper-text">This will appear in campaign listings</span>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Full Description <span class="required">*</span></label>
-                            <textarea rows="8"
+                            <label>Campaign Description <span class="required">*</span></label>
+                            <textarea 
+                                rows="8"
+                                formControlName="description"
                                 placeholder="Provide detailed information about your campaign, including goals, impact, and how funds will be used..."
-                                required></textarea>
+                                [class.invalid]="description?.invalid && description?.touched"
+                            ></textarea>
+                            <span class="helper-text">Minimum 50 characters. Be detailed and compelling.</span>
+                            <span *ngIf="description?.invalid && description?.touched" class="error-text">
+                                <span *ngIf="description?.errors?.['required']">Description is required</span>
+                                <span *ngIf="description?.errors?.['minlength']">Description must be at least 50 characters</span>
+                            </span>
                         </div>
 
                         <div class="form-group">
-                            <label>Campaign Image <span class="required">*</span></label>
-                            <div class="file-upload">
-                                <input type="file" id="campaign-image" accept="image/*">
-                                <label for="campaign-image" class="file-upload-label">
-                                    <span class="upload-icon">📷</span>
-                                    <span>Click to upload or drag and drop</span>
-                                    <span class="upload-hint">PNG, JPG up to 5MB</span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="section-card">
-                        <h2>Additional Information</h2>
-
-                        <div class="form-group">
-                            <label>Location/Region</label>
-                            <input type="text" placeholder="e.g., Gaza, West Bank, Jerusalem">
-                        </div>
-
-                        <div class="form-group">
-                            <label>Beneficiaries</label>
-                            <input type="text" placeholder="Who will benefit from this campaign?">
-                        </div>
-
-                        <div class="form-group">
-                            <label>Video URL (Optional)</label>
-                            <input type="url" placeholder="https://youtube.com/watch?v=...">
-                            <span class="helper-text">Add a YouTube or Vimeo video to increase engagement</span>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Tags</label>
-                            <input type="text" placeholder="e.g., emergency, medical, children (comma separated)">
-                            <span class="helper-text">Help people discover your campaign</span>
-                        </div>
-                    </div>
-
-                    <div class="section-card">
-                        <h2>Terms & Conditions</h2>
-
-                        <div class="checkbox-group">
-                            <label class="checkbox-label">
-                                <input type="checkbox" required>
-                                <span>I confirm that all information provided is accurate and truthful</span>
-                            </label>
-                        </div>
-
-                        <div class="checkbox-group">
-                            <label class="checkbox-label">
-                                <input type="checkbox" required>
-                                <span>I agree to provide regular updates on campaign progress</span>
-                            </label>
-                        </div>
-
-                        <div class="checkbox-group">
-                            <label class="checkbox-label">
-                                <input type="checkbox" required>
-                                <span>I understand that funds will be disbursed according to platform policies</span>
-                            </label>
-                        </div>
-
-                        <div class="checkbox-group">
-                            <label class="checkbox-label">
-                                <input type="checkbox" required>
-                                <span>I agree to the <a href="#" class="link">Terms of Service</a> and <a href="#"
-                                        class="link">Privacy Policy</a></span>
-                            </label>
+                            <label>Image URL (Optional)</label>
+                            <input 
+                                type="url" 
+                                formControlName="imageUrl"
+                                placeholder="https://example.com/image.jpg"
+                            >
+                            <span class="helper-text">Provide a URL to an image for your campaign</span>
                         </div>
                     </div>
 
                     <div class="form-actions">
-                        <button type="button" class="btn btn-outline">Save as Draft</button>
-                        <button type="submit" class="btn btn-primary">Submit for Review</button>
+                        <button 
+                            type="submit" 
+                            class="btn btn-primary"
+                            [disabled]="isLoading"
+                        >
+                            <span *ngIf="isLoading">Submitting...</span>
+                            <span *ngIf="!isLoading">Submit for Review</span>
+                        </button>
                     </div>
                 </form>
             </div>
