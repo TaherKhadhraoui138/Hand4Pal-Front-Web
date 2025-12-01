@@ -1,7 +1,10 @@
 import { Campaign } from './campaign.models';
 
 export interface Comment {
-    commentId: number;
+    // Some endpoints return "id", others "commentId" - support both
+    id?: number;
+    commentId?: number;
+    comment_id?: number;
     campaignId: number;
     citizenId: number;
     content: string;

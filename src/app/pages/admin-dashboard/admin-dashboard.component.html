@@ -325,11 +325,11 @@
                                         </div>
                                         <button 
                                             class="btn btn-danger btn-sm delete-comment-btn"
-                                            (click)="onDeleteComment(comment.commentId, campaign.id)"
-                                            [disabled]="deletingCommentId === comment.commentId"
+                                            (click)="onDeleteComment(getCommentId(comment), campaign.id)"
+                                            [disabled]="deletingCommentId === getCommentId(comment)"
                                             title="Delete comment">
-                                            <span *ngIf="deletingCommentId === comment.commentId">Deleting...</span>
-                                            <span *ngIf="deletingCommentId !== comment.commentId">🗑️ Delete</span>
+                                            <span *ngIf="deletingCommentId === getCommentId(comment)">Deleting...</span>
+                                            <span *ngIf="deletingCommentId !== getCommentId(comment)">🗑️ Delete</span>
                                         </button>
                                     </div>
                                     <div class="comment-content">
