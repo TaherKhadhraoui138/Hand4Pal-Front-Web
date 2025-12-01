@@ -6,13 +6,16 @@
         </div>
 
         <nav class="sidebar-nav">
-            <button class="nav-btn" [class.active]="activeTab() === 'overview'" (click)="activeTab.set('overview')">
+            <button class="nav-btn" [class.active]="activeTab() === 'overview'" (click)="activeTab.set('overview'); closeCampaignDetails()">
                 <span class="icon">📊</span> Overview
             </button>
-            <button class="nav-btn" [class.active]="activeTab() === 'campaigns'" (click)="activeTab.set('campaigns')">
+            <button class="nav-btn" [class.active]="activeTab() === 'campaigns'" (click)="activeTab.set('campaigns'); closeCampaignDetails()">
                 <span class="icon">📢</span> My Campaigns
             </button>
-            <button class="nav-btn" [class.active]="activeTab() === 'donations'" (click)="activeTab.set('donations')">
+            <button class="nav-btn" [class.active]="activeTab() === 'comments'" (click)="activeTab.set('comments')">
+                <span class="icon">💬</span> Comments
+            </button>
+            <button class="nav-btn" [class.active]="activeTab() === 'donations'" (click)="activeTab.set('donations'); closeCampaignDetails()">
                 <span class="icon">💰</span> Donations
             </button>
         </nav>
@@ -171,6 +174,7 @@
                             </div>
                             <div class="campaign-actions">
                                 <button class="btn btn-outline btn-sm" (click)="openEditModal(campaign)">✏️ Edit</button>
+                                <button class="btn btn-outline btn-sm" (click)="viewCampaignDetails(campaign)">💬 Comments</button>
                                 <a [routerLink]="['/association-campaigns', campaign.id]" class="btn btn-outline btn-sm">👁️ View</a>
                             </div>
                         </div>
@@ -233,6 +237,71 @@
                             </div>
                             <div class="campaign-actions">
                                 <a [routerLink]="['/association-campaigns', campaign.id]" class="btn btn-outline btn-sm">👁️ View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comments View -->
+            <div *ngIf="activeTab() === 'comments'">
+                <div *ngIf="!selectedCampaignForDetails" class="empty-state">
+                    <div class="empty-icon">💬</div>
+                    <h3>Campaign Comments</h3>
+                    <p>Select a campaign to view its comments</p>
+                    <div class="campaigns-grid" style="margin-top: 2rem;">
+                        <div class="campaign-card-mini" *ngFor="let campaign of activeCampaigns">
+                            <h4>{{ campaign.title }}</h4>
+                            <p class="campaign-category">{{ getCategoryName(campaign.category) }}</p>
+                            <button class="btn btn-primary btn-sm" (click)="viewCampaignDetails(campaign)" [disabled]="isLoadingCampaignDetails">
+                                {{ isLoadingCampaignDetails ? 'Loading...' : 'View Comments' }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div *ngIf="selectedCampaignForDetails" class="campaign-details-view">
+                    <div class="details-header">
+                        <button class="btn btn-outline" (click)="closeCampaignDetails()">← Back to Campaigns</button>
+                        <h3>{{ selectedCampaignForDetails.title }}</h3>
+                    </div>
+
+                    <div class="campaign-info-card">
+                        <div class="info-row">
+                            <span class="info-label">Category:</span>
+                            <span class="category-tag">{{ getCategoryName(selectedCampaignForDetails.category) }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Status:</span>
+                            <span class="status-badge" [class]="getStatusClass(selectedCampaignForDetails)">{{ getStatusLabel(selectedCampaignForDetails) }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Progress:</span>
+                            <span>{{ formatCurrency(selectedCampaignForDetails.collectedAmount || 0) }} / {{ formatCurrency(selectedCampaignForDetails.targetAmount) }}</span>
+                        </div>
+                    </div>
+
+                    <div class="comments-section">
+                        <h4>💬 Comments ({{ selectedCampaignForDetails.comments?.length || 0 }})</h4>
+                        
+                        <div *ngIf="!selectedCampaignForDetails.comments || selectedCampaignForDetails.comments.length === 0" class="empty-comments">
+                            <p>👋 No comments yet on this campaign</p>
+                        </div>
+
+                        <div *ngIf="selectedCampaignForDetails.comments && selectedCampaignForDetails.comments.length > 0" class="comments-list">
+                            <div class="comment-card" *ngFor="let comment of selectedCampaignForDetails.comments">
+                                <div class="comment-header">
+                                    <div class="comment-author">
+                                        <div class="avatar-sm">{{ (comment.citizenName || comment.userName || 'C').charAt(0).toUpperCase() }}</div>
+                                        <div class="author-info">
+                                            <strong>{{ comment.citizenName || comment.userName || 'Citizen #' + comment.citizenId }}</strong>
+                                            <span class="comment-time">{{ getCommentTimeAgo(comment.publicationDate) }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="comment-content">
+                                    <p>{{ comment.content }}</p>
+                                </div>
                             </div>
                         </div>
                     </div>

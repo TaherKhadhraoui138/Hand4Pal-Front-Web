@@ -61,6 +61,10 @@ export class AssociationDashboard implements OnInit, OnDestroy {
   // Association info
   associationName = '';
   
+  // Selected campaign for viewing details
+  selectedCampaignForDetails: Campaign | null = null;
+  isLoadingCampaignDetails = false;
+  
   categories: { label: string; value: CampaignCategory }[] = [
     { label: 'Health', value: 'HEALTH' },
     { label: 'Education', value: 'EDUCATION' },
@@ -271,5 +275,45 @@ export class AssociationDashboard implements OnInit, OnDestroy {
   // Get campaign image URL (handles both naming conventions)
   getImageUrl(campaign: Campaign): string | null {
     return getCampaignImageUrl(campaign);
+  }
+  
+  // View campaign details with comments
+  viewCampaignDetails(campaign: Campaign): void {
+    this.isLoadingCampaignDetails = true;
+    this.campaignService.getCampaignWithDetails(campaign.id)
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => this.isLoadingCampaignDetails = false)
+      )
+      .subscribe({
+        next: (campaignWithDetails) => {
+          this.selectedCampaignForDetails = campaignWithDetails;
+          this.activeTab.set('comments');
+        },
+        error: (err) => {
+          console.error('Failed to load campaign details', err);
+          this.showAlert('Error', 'Failed to load campaign details. Please try again.', 'error');
+        }
+      });
+  }
+  
+  closeCampaignDetails(): void {
+    this.selectedCampaignForDetails = null;
+  }
+  
+  getCommentTimeAgo(dateStr: string): string {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / (1000 * 60));
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
+    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+    if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+    if (diffDays < 30) return `${Math.floor(diffDays / 7)} week${Math.floor(diffDays / 7) > 1 ? 's' : ''} ago`;
+    return `${Math.floor(diffDays / 30)} month${Math.floor(diffDays / 30) > 1 ? 's' : ''} ago`;
   }
 }
