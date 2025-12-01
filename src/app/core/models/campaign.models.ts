@@ -2,6 +2,8 @@
  * Campaign model interfaces - Matching backend Campaign entity
  */
 
+import { Comment } from './comment.models';
+
 export interface Campaign {
     id: number;
     title: string;
@@ -22,6 +24,8 @@ export interface Campaign {
     createdAt?: string;
     endDate?: string;
     status: CampaignStatus;
+    comments?: Comment[];      // Comments for this campaign
+    donations?: any[];         // Donations for this campaign
 }
 
 /**

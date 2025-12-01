@@ -90,6 +90,28 @@ export class CampaignService {
     }
 
     /**
+     * Get campaign by ID with comments and donations (requires auth)
+     * GET /campaigns/:id/with-details
+     */
+    getCampaignWithDetails(campaignId: number): Observable<Campaign> {
+        return this.http.get<Campaign>(`${this.API_URL}/${campaignId}/with-details`).pipe(
+            timeout(this.TIMEOUT_MS),
+            catchError(this.handleTimeout)
+        );
+    }
+
+    /**
+     * Get all active campaigns with comments and donations (requires auth)
+     * GET /campaigns/active/with-details
+     */
+    getActiveCampaignsWithDetails(): Observable<Campaign[]> {
+        return this.http.get<Campaign[]>(`${this.API_URL}/active/with-details`).pipe(
+            timeout(this.TIMEOUT_MS),
+            catchError(this.handleTimeout)
+        );
+    }
+
+    /**
      * Approve campaign (Admin only)
      * PUT /campaigns/:id/approve
      */

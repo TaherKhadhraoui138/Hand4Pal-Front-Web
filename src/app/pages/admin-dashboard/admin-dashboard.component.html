@@ -278,8 +278,71 @@
             </div>
 
             <!-- Comments Management -->
-            <div *ngIf="activeTab === 'comments'" class="empty-state">
-                <p>Comment management coming soon</p>
+            <div *ngIf="activeTab === 'comments'">
+                <div class="section-header">
+                    <h3>Comments Management</h3>
+                    <p>Review and moderate comments across all active campaigns</p>
+                </div>
+
+                <div *ngIf="isCommentsLoading" class="loading-state">
+                    Loading campaigns and comments...
+                </div>
+
+                <div *ngIf="!isCommentsLoading && campaignsWithComments.length === 0" class="empty-state">
+                    <p>No campaigns with comments found</p>
+                </div>
+
+                <div *ngIf="!isCommentsLoading && campaignsWithComments.length > 0" class="comments-section">
+                    <div *ngFor="let campaign of campaignsWithComments" class="campaign-comments-card">
+                        <div class="campaign-header" (click)="toggleCampaignComments(campaign.id)">
+                            <div class="campaign-info">
+                                <h4>{{ campaign.title }}</h4>
+                                <p class="campaign-meta">
+                                    <span class="category-badge">{{ getCategoryName(campaign.category) }}</span>
+                                    <span *ngIf="campaign.associationName">{{ campaign.associationName }}</span>
+                                </p>
+                            </div>
+                            <div class="campaign-stats">
+                                <span class="comment-count">💬 {{ getCommentCount(campaign) }} comments</span>
+                                <span class="expand-icon">{{ isCampaignExpanded(campaign.id) ? '▼' : '▶' }}</span>
+                            </div>
+                        </div>
+
+                        <div *ngIf="isCampaignExpanded(campaign.id)" class="comments-list">
+                            <div *ngIf="!campaign.comments || campaign.comments.length === 0" class="no-comments">
+                                <p>No comments yet for this campaign</p>
+                            </div>
+
+                            <div *ngIf="campaign.comments && campaign.comments.length > 0">
+                                <div *ngFor="let comment of campaign.comments" class="comment-item">
+                                    <div class="comment-header">
+                                        <div class="comment-author">
+                                            <div class="avatar-sm">{{ comment.userName ? comment.userName.charAt(0).toUpperCase() : 'U' }}</div>
+                                            <div class="author-info">
+                                                <span class="author-name">{{ comment.userName || 'Citizen #' + comment.citizenId }}</span>
+                                                <span class="comment-date">{{ formatDate(comment.publicationDate) }}</span>
+                                            </div>
+                                        </div>
+                                        <button 
+                                            class="btn btn-danger btn-sm delete-comment-btn"
+                                            (click)="onDeleteComment(comment.commentId, campaign.id)"
+                                            [disabled]="deletingCommentId === comment.commentId"
+                                            title="Delete comment">
+                                            <span *ngIf="deletingCommentId === comment.commentId">Deleting...</span>
+                                            <span *ngIf="deletingCommentId !== comment.commentId">🗑️ Delete</span>
+                                        </button>
+                                    </div>
+                                    <div class="comment-content">
+                                        <p>{{ comment.content }}</p>
+                                    </div>
+                                    <div class="comment-meta" *ngIf="comment.lastModifiedDate">
+                                        <small>Edited: {{ formatDate(comment.lastModifiedDate) }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </main>

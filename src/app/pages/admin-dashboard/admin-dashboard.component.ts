@@ -5,6 +5,8 @@ import { UserService } from '../../core/services/user.service';
 import { AdminService } from '../../core/services/admin.service';
 import { AuthService } from '../../core/services/auth.service';
 import { CampaignService } from '../../core/services/campaign.service';
+import { CommentService } from '../../core/services/comment.service';
+import { CampaignWithDetails, Comment } from '../../core/models/comment.models';
 import { User } from '../../core/models/auth.models';
 import { Campaign, getCategoryDisplayName, getAssociationName } from '../../core/models/campaign.models';
 import { AlertModalComponent, AlertType } from '../../shared/alert-modal/alert-modal.component';
@@ -26,6 +28,12 @@ export class AdminDashboardComponent implements OnInit {
     isLoading = false;
     isCampaignsLoading = false;
     searchQuery = '';
+    
+    // Comments management
+    campaignsWithComments: CampaignWithDetails[] = [];
+    isCommentsLoading = false;
+    expandedCampaigns = new Set<number>();
+    deletingCommentId: number | null = null;
 
     // Alert modal state
     alertModal = {
@@ -47,13 +55,15 @@ export class AdminDashboardComponent implements OnInit {
         private userService: UserService,
         private adminService: AdminService,
         private authService: AuthService,
-        private campaignService: CampaignService
+        private campaignService: CampaignService,
+        private commentService: CommentService
     ) { }
 
     ngOnInit(): void {
         this.loadUsers();
         this.loadPendingAssociations();
         this.loadCampaigns();
+        this.loadCampaignsWithComments();
     }
 
     loadUsers(): void {
@@ -266,5 +276,80 @@ export class AdminDashboardComponent implements OnInit {
             this.confirmModal.action();
         }
         this.closeConfirm();
+    }
+
+    // Comments Management
+    loadCampaignsWithComments(): void {
+        this.isCommentsLoading = true;
+        
+        this.commentService.getActiveCampaignsWithDetails().subscribe({
+            next: (campaigns) => {
+                this.campaignsWithComments = campaigns;
+                this.isCommentsLoading = false;
+            },
+            error: (error) => {
+                console.error('Failed to load campaigns with details', error);
+                this.showAlert('Error', 'Failed to load campaigns. Please try again.', 'error');
+                this.isCommentsLoading = false;
+            }
+        });
+    }
+
+    toggleCampaignComments(campaignId: number): void {
+        if (this.expandedCampaigns.has(campaignId)) {
+            this.expandedCampaigns.delete(campaignId);
+        } else {
+            this.expandedCampaigns.add(campaignId);
+        }
+    }
+
+    isCampaignExpanded(campaignId: number): boolean {
+        return this.expandedCampaigns.has(campaignId);
+    }
+
+    onDeleteComment(commentId: number, campaignId: number): void {
+        this.showConfirm(
+            'Delete Comment',
+            'Are you sure you want to delete this comment? This action cannot be undone.',
+            () => {
+                this.deletingCommentId = commentId;
+                this.commentService.deleteComment(commentId).subscribe({
+                    next: () => {
+                        // Update local state
+                        const campaign = this.campaignsWithComments.find(c => c.id === campaignId);
+                        if (campaign && campaign.comments) {
+                            campaign.comments = campaign.comments.filter(c => c.commentId !== commentId);
+                        }
+                        this.deletingCommentId = null;
+                        this.showAlert('Success', 'Comment deleted successfully!', 'success');
+                    },
+                    error: (error) => {
+                        console.error('Failed to delete comment', error);
+                        this.deletingCommentId = null;
+                        if (error.status === 403) {
+                            this.showAlert('Access Denied', 'You do not have permission to delete comments.', 'error');
+                        } else {
+                            this.showAlert('Error', 'Failed to delete comment. Please try again.', 'error');
+                        }
+                    }
+                });
+            }
+        );
+    }
+
+    getCommentCount(campaign: Campaign): number {
+        return campaign.comments ? campaign.comments.length : 0;
+    }
+
+    formatDate(dateString: string): string {
+        if (!dateString) return 'N/A';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
     }
 }
