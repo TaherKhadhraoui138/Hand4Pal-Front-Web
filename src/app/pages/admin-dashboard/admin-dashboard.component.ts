@@ -315,11 +315,8 @@ export class AdminDashboardComponent implements OnInit {
                 this.deletingCommentId = commentId;
                 this.commentService.deleteComment(commentId).subscribe({
                     next: () => {
-                        // Update local state
-                        const campaign = this.campaignsWithComments.find(c => c.id === campaignId);
-                        if (campaign && campaign.comments) {
-                            campaign.comments = campaign.comments.filter(c => c.commentId !== commentId);
-                        }
+                        // Reload campaigns/comments from backend so UI reflects latest state
+                        this.loadCampaignsWithComments();
                         this.deletingCommentId = null;
                         this.showAlert('Success', 'Comment deleted successfully!', 'success');
                     },
@@ -339,6 +336,15 @@ export class AdminDashboardComponent implements OnInit {
 
     getCommentCount(campaign: Campaign): number {
         return campaign.comments ? campaign.comments.length : 0;
+    }
+
+    /**
+     * Safely get the numeric ID of a comment, regardless of whether
+     * the backend used "id" or "commentId" as the field name.
+     */
+    getCommentId(comment: Comment): number {
+        const anyComment = comment as any;
+        return anyComment.commentId ?? anyComment.id ?? anyComment.comment_id;
     }
 
     formatDate(dateString: string): string {
