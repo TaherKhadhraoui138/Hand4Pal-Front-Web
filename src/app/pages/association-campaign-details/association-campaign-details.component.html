@@ -79,10 +79,20 @@
 
                             <h3>Comments</h3>
                             <div class="comments-section">
-                                <app-comment *ngFor="let i of [1,2,3]" author="Anonymous Donor"
-                                    content="Praying for everyone's safety. Keep up the great work." timeAgo="2 hours ago"
-                                    [donationAmount]="50">
+                                <div *ngIf="!isLoadingComments && comments.length === 0" class="no-comments">
+                                    <p>No comments yet. Be the first to comment!</p>
+                                </div>
+                                <app-comment 
+                                    *ngFor="let comment of comments.slice(0, 3)" 
+                                    [author]="getCommentAuthor(comment)"
+                                    [content]="comment.content" 
+                                    [timeAgo]="getTimeAgo(comment.publicationDate)">
                                 </app-comment>
+                                <p *ngIf="!isLoadingComments && comments.length > 3" class="view-all-comments">
+                                    <button class="btn btn-link" (click)="setActiveTab('comments')">
+                                        View all {{ comments.length }} comments →
+                                    </button>
+                                </p>
                             </div>
                         </div>
 
@@ -108,9 +118,17 @@
                         <!-- Comments Tab -->
                         <div *ngIf="activeTab === 'comments'">
                             <div class="comments-section">
-                                <app-comment *ngFor="let i of [1,2,3,4,5]" author="Anonymous Donor"
-                                    content="Praying for everyone's safety. Keep up the great work." timeAgo="2 hours ago"
-                                    [donationAmount]="50">
+                                <div *ngIf="isLoadingComments" class="loading-comments">
+                                    <p style="text-align: center; color: var(--light-text); padding: 1rem;">Loading...</p>
+                                </div>
+                                <div *ngIf="!isLoadingComments && comments.length === 0" class="no-comments">
+                                    <p>No comments yet. Be the first to comment!</p>
+                                </div>
+                                <app-comment 
+                                    *ngFor="let comment of comments" 
+                                    [author]="getCommentAuthor(comment)"
+                                    [content]="comment.content" 
+                                    [timeAgo]="getTimeAgo(comment.publicationDate)">
                                 </app-comment>
                             </div>
                         </div>
@@ -164,9 +182,18 @@
 
                         <div class="recent-donations">
                             <h4>Recent Donations</h4>
-                            <app-comment author="Anonymous" timeAgo="5m" [donationAmount]="100"></app-comment>
-                            <app-comment author="John D." timeAgo="15m" [donationAmount]="50"></app-comment>
-                            <app-comment author="Sarah M." timeAgo="1h" [donationAmount]="200"></app-comment>
+                            <div *ngIf="isLoadingDonations" class="loading-donations">
+                                <p style="text-align: center; color: var(--light-text); padding: 1rem;">Loading...</p>
+                            </div>
+                            <div *ngIf="!isLoadingDonations && recentDonations.length === 0" class="no-donations">
+                                <p style="text-align: center; color: var(--light-text); padding: 1rem; font-style: italic;">No donations yet</p>
+                            </div>
+                            <app-comment 
+                                *ngFor="let donation of recentDonations" 
+                                [author]="getDonorName(donation)" 
+                                [timeAgo]="getDonationTimeAgo(donation.donationDate)" 
+                                [donationAmount]="donation.amount">
+                            </app-comment>
                         </div>
                     </div>
                 </div>
