@@ -177,7 +177,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
         }
     }
 
-    formatCurrency(amount: number, currency: string = 'USD'): string {
+    formatCurrency(amount: number, currency: string = 'DT'): string {
         return this.donationViewModel.formatCurrency(amount, currency);
     }
 }

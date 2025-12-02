@@ -249,7 +249,7 @@ export class DonationViewModel {
             campaignId,
             totalDonations: donations.length,
             totalAmount: donations.reduce((sum, d) => sum + d.amount, 0),
-            currency: donations[0]?.currency || 'USD'
+            currency: donations[0]?.currency || 'DT'
         };
     }
 
@@ -311,15 +311,13 @@ export class DonationViewModel {
     /**
      * Formater un montant en devise
      * @param amount Le montant
-     * @param currency La devise (par défaut USD)
+     * @param currency La devise (par défaut DT)
      */
-    formatCurrency(amount: number, currency: string = 'USD'): string {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: currency,
+    formatCurrency(amount: number, currency: string = 'DT'): string {
+        return new Intl.NumberFormat('fr-FR', {
             minimumFractionDigits: 0,
             maximumFractionDigits: 2
-        }).format(amount);
+        }).format(amount) + ' DT';
     }
 
     /**

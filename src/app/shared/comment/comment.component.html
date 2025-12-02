@@ -3,7 +3,7 @@
     <div class="comment-content">
         <div class="comment-header">
             <strong>{{ author }}</strong>
-            <span class="donation-badge" *ngIf="donationAmount">{{ donationAmount | currency }}</span>
+            <span class="donation-badge" *ngIf="donationAmount">{{ donationAmount }}DT</span>
             <span class="time">{{ timeAgo }}</span>
         </div>
         <p>{{ content }}</p>

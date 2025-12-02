@@ -24,7 +24,7 @@ export class DonationModalComponent implements OnDestroy {
 
     selectedAmount: number = 50;
     customAmount: number | null = null;
-    currency: string = 'USD';
+    currency: string = 'DT';
     
     // Expose ViewModel loading state
     isLoading$ = this.donationViewModel.loading$;
@@ -78,7 +78,7 @@ export class DonationModalComponent implements OnDestroy {
             this.showAlertModal(
                 'success', 
                 'Donation Successful!', 
-                `Thank you for your generous donation of $${amount} to "${this.campaignTitle}". Your support makes a difference!`
+                `Thank you for your generous donation of ${amount} DT to "${this.campaignTitle}". Your support makes a difference!`
             );
         } else {
             // Get error from ViewModel
