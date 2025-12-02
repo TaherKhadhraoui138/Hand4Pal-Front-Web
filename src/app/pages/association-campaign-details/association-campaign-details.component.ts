@@ -8,6 +8,10 @@ import { Campaign, CampaignCategory, getCategoryDisplayName, getCategoryEmoji, g
 import { CampaignViewModel } from '../../core/viewmodels/campaign.viewmodel';
 import { CampaignService } from '../../core/services/campaign.service';
 import { AlertModalComponent, AlertType } from '../../shared/alert-modal/alert-modal.component';
+import { CommentService } from '../../core/services/comment.service';
+import { Comment } from '../../core/models/comment.models';
+import { DonationService } from '../../core/services/donation.service';
+import { Donation, getDonorName } from '../../core/models/donation.models';
 
 @Component({
     selector: 'app-association-campaign-details',
@@ -21,6 +25,8 @@ export class AssociationCampaignDetailsComponent implements OnInit, OnDestroy {
     private route = inject(ActivatedRoute);
     private router = inject(Router);
     private campaignService = inject(CampaignService);
+    private commentService = inject(CommentService);
+    private donationService = inject(DonationService);
     public campaignViewModel = inject(CampaignViewModel);
     
     // Use observables directly with async pipe for better change detection
@@ -31,6 +37,12 @@ export class AssociationCampaignDetailsComponent implements OnInit, OnDestroy {
     // Local UI state
     isEditModalOpen = false;
     activeTab: 'about' | 'updates' | 'comments' = 'about';
+    comments: Comment[] = [];
+    isLoadingComments = false;
+    
+    // Donations state
+    recentDonations: Donation[] = [];
+    isLoadingDonations = false;
     
     // Edit form
     editForm = {
@@ -65,6 +77,21 @@ export class AssociationCampaignDetailsComponent implements OnInit, OnDestroy {
         const campaignId = this.route.snapshot.paramMap.get('id');
         if (campaignId) {
             this.campaignViewModel.loadCampaignById(+campaignId);
+            
+            // Check for tab query param
+            this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(params => {
+                if (params['tab'] && ['about', 'updates', 'comments'].includes(params['tab'])) {
+                    this.activeTab = params['tab'];
+                }
+            });
+
+            // Load comments when campaign is loaded
+            this.campaign$.pipe(takeUntil(this.destroy$)).subscribe(campaign => {
+                if (campaign) {
+                    this.loadComments(campaign.id);
+                    this.loadRecentDonations(campaign.id);
+                }
+            });
         } else {
             this.router.navigate(['/association-dashboard']);
         }
@@ -130,6 +157,69 @@ export class AssociationCampaignDetailsComponent implements OnInit, OnDestroy {
      */
     setActiveTab(tab: 'about' | 'updates' | 'comments'): void {
         this.activeTab = tab;
+        // Load comments when switching to comments tab
+        if (tab === 'comments') {
+            const campaignId = this.route.snapshot.paramMap.get('id');
+            if (campaignId) {
+                this.loadComments(+campaignId);
+            }
+        }
+    }
+
+    /**
+     * Load comments for a campaign
+     */
+    loadComments(campaignId: number): void {
+        this.isLoadingComments = true;
+        this.commentService.getCommentsByCampaign(campaignId)
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+                next: (comments) => {
+                    this.comments = comments;
+                    this.isLoadingComments = false;
+                },
+                error: (err) => {
+                    console.error('Failed to load comments', err);
+                    this.comments = [];
+                    this.isLoadingComments = false;
+                }
+            });
+    }
+
+    /**
+     * Get author name from comment
+     */
+    getCommentAuthor(comment: Comment): string {
+        return comment.citizenName || comment.userName || 'Anonymous Donor';
+    }
+
+    /**
+     * Format time ago from publication date
+     */
+    getTimeAgo(dateStr: string): string {
+        if (!dateStr) return '';
+        
+        const date = new Date(dateStr);
+        const now = new Date();
+        const diffMs = now.getTime() - date.getTime();
+        const diffMins = Math.floor(diffMs / (1000 * 60));
+        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+        
+        if (diffMins < 1) return 'Just now';
+        if (diffMins < 60) return `${diffMins} ${diffMins === 1 ? 'minute' : 'minutes'} ago`;
+        if (diffHours < 24) return `${diffHours} ${diffHours === 1 ? 'hour' : 'hours'} ago`;
+        if (diffDays < 7) return `${diffDays} ${diffDays === 1 ? 'day' : 'days'} ago`;
+        if (diffDays < 30) {
+            const weeks = Math.floor(diffDays / 7);
+            return `${weeks} ${weeks === 1 ? 'week' : 'weeks'} ago`;
+        }
+        if (diffDays < 365) {
+            const months = Math.floor(diffDays / 30);
+            return `${months} ${months === 1 ? 'month' : 'months'} ago`;
+        }
+        const years = Math.floor(diffDays / 365);
+        return `${years} ${years === 1 ? 'year' : 'years'} ago`;
     }
 
     /**
@@ -261,5 +351,55 @@ export class AssociationCampaignDetailsComponent implements OnInit, OnDestroy {
      */
     goBack(): void {
         this.router.navigate(['/association-dashboard']);
+    }
+    
+    /**
+     * Load recent donations for the campaign
+     */
+    loadRecentDonations(campaignId: number): void {
+        this.isLoadingDonations = true;
+        this.donationService.getDonationsByCampaign(campaignId)
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+                next: (donations) => {
+                    // Get the 3 most recent donations
+                    this.recentDonations = donations
+                        .sort((a, b) => new Date(b.donationDate).getTime() - new Date(a.donationDate).getTime())
+                        .slice(0, 3);
+                    this.isLoadingDonations = false;
+                },
+                error: (err) => {
+                    console.error('Failed to load donations', err);
+                    this.recentDonations = [];
+                    this.isLoadingDonations = false;
+                }
+            });
+    }
+
+    /**
+     * Get donor display name
+     */
+    getDonorName(donation: Donation): string {
+        return getDonorName(donation);
+    }
+
+    /**
+     * Get donation time ago
+     */
+    getDonationTimeAgo(dateString: string): string {
+        if (!dateString) return '';
+        
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffMs = now.getTime() - date.getTime();
+        const diffMins = Math.floor(diffMs / (1000 * 60));
+        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+        
+        if (diffMins < 1) return 'Just now';
+        if (diffMins < 60) return `${diffMins}m`;
+        if (diffHours < 24) return `${diffHours}h`;
+        if (diffDays < 7) return `${diffDays}d`;
+        return `${Math.floor(diffDays / 7)}w`;
     }
 }

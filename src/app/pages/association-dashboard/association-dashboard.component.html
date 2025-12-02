@@ -245,14 +245,21 @@
 
             <!-- Comments View -->
             <div *ngIf="activeTab() === 'comments'">
-                <div *ngIf="!selectedCampaignForDetails" class="empty-state">
+                <div *ngIf="isCommentsLoading" class="loading-state">
+                    <div class="loading-spinner"></div>
+                    <p>Loading campaigns with comments...</p>
+                </div>
+
+                <div *ngIf="!isCommentsLoading && !selectedCampaignForDetails" class="empty-state">
                     <div class="empty-icon">💬</div>
                     <h3>Campaign Comments</h3>
-                    <p>Select a campaign to view its comments</p>
-                    <div class="campaigns-grid" style="margin-top: 2rem;">
-                        <div class="campaign-card-mini" *ngFor="let campaign of activeCampaigns">
+                    <p *ngIf="campaignsWithComments.length === 0">No campaigns with comments found</p>
+                    <p *ngIf="campaignsWithComments.length > 0">Select a campaign to view its comments</p>
+                    <div *ngIf="campaignsWithComments.length > 0" class="campaigns-grid" style="margin-top: 2rem;">
+                        <div class="campaign-card-mini" *ngFor="let campaign of campaignsWithComments">
                             <h4>{{ campaign.title }}</h4>
                             <p class="campaign-category">{{ getCategoryName(campaign.category) }}</p>
+                            <p class="comment-count-badge">💬 {{ getCommentCount(campaign) }} comment{{ getCommentCount(campaign) !== 1 ? 's' : '' }}</p>
                             <button class="btn btn-primary btn-sm" (click)="viewCampaignDetails(campaign)" [disabled]="isLoadingCampaignDetails">
                                 {{ isLoadingCampaignDetails ? 'Loading...' : 'View Comments' }}
                             </button>
@@ -309,10 +316,86 @@
             </div>
 
             <!-- Donations View -->
-            <div *ngIf="activeTab() === 'donations'" class="empty-state">
-                <div class="empty-icon">💰</div>
-                <h3>Donations</h3>
-                <p>Donation tracking coming soon.</p>
+            <div *ngIf="activeTab() === 'donations'">
+                <div *ngIf="isCommentsLoading" class="loading-state">
+                    <div class="loading-spinner"></div>
+                    <p>Loading campaigns with donations...</p>
+                </div>
+
+                <div *ngIf="!isCommentsLoading && !selectedCampaignForDonations" class="empty-state">
+                    <div class="empty-icon">💰</div>
+                    <h3>Campaign Donations</h3>
+                    <p *ngIf="campaignsWithComments.length === 0">No campaigns with donations found</p>
+                    <p *ngIf="campaignsWithComments.length > 0">Select a campaign to view its donations</p>
+                    <div *ngIf="campaignsWithComments.length > 0" class="campaigns-grid" style="margin-top: 2rem;">
+                        <div class="campaign-card-mini" *ngFor="let campaign of campaignsWithComments">
+                            <h4>{{ campaign.title }}</h4>
+                            <p class="campaign-category">{{ getCategoryName(campaign.category) }}</p>
+                            <div class="donation-stats-preview">
+                                <p class="donation-count-badge">
+                                    💰 {{ getDonationCount(campaign) }} donation{{ getDonationCount(campaign) !== 1 ? 's' : '' }}
+                                </p>
+                                <p class="donation-amount-badge" *ngIf="getDonationCount(campaign) > 0">
+                                    Total: {{ formatCurrency(getTotalDonationsAmount(campaign)) }}
+                                </p>
+                            </div>
+                            <button class="btn btn-primary btn-sm" (click)="viewCampaignDonations(campaign)">
+                                View Donations
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div *ngIf="selectedCampaignForDonations" class="campaign-details-view">
+                    <div class="details-header">
+                        <button class="btn btn-outline" (click)="closeCampaignDonations()">← Back to Campaigns</button>
+                        <h3>{{ selectedCampaignForDonations.title }}</h3>
+                    </div>
+
+                    <div class="campaign-info-card">
+                        <div class="info-row">
+                            <span class="info-label">Category:</span>
+                            <span class="category-tag">{{ getCategoryName(selectedCampaignForDonations.category) }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Status:</span>
+                            <span class="status-badge" [class]="getStatusClass(selectedCampaignForDonations)">{{ getStatusLabel(selectedCampaignForDonations) }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Progress:</span>
+                            <span>{{ formatCurrency(selectedCampaignForDonations.collectedAmount || 0) }} / {{ formatCurrency(selectedCampaignForDonations.targetAmount) }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Total Donations:</span>
+                            <span class="text-gradient">{{ formatCurrency(getTotalDonationsAmount(selectedCampaignForDonations)) }}</span>
+                        </div>
+                    </div>
+
+                    <div class="comments-section">
+                        <h4>💰 Donations ({{ selectedCampaignForDonations.donations?.length || 0 }})</h4>
+                        
+                        <div *ngIf="!selectedCampaignForDonations.donations || selectedCampaignForDonations.donations.length === 0" class="empty-comments">
+                            <p>👋 No donations yet for this campaign</p>
+                        </div>
+
+                        <div *ngIf="selectedCampaignForDonations.donations && selectedCampaignForDonations.donations.length > 0" class="comments-list">
+                            <div class="comment-card" *ngFor="let donation of selectedCampaignForDonations.donations">
+                                <div class="comment-header">
+                                    <div class="comment-author">
+                                        <div class="avatar-sm">{{ getDonorDisplayName(donation).charAt(0).toUpperCase() }}</div>
+                                        <div class="author-info">
+                                            <strong>{{ getDonorDisplayName(donation) }}</strong>
+                                            <span class="comment-time">{{ formatDonationDate(donation.donationDate) }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="donation-amount">
+                                        <span class="amount-badge">{{ formatCurrency(donation.amount) }} {{ donation.currency || 'USD' }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             </ng-container>
         </div>
