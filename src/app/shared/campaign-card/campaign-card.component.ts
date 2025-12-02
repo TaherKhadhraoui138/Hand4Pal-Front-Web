@@ -80,11 +80,9 @@ export class CampaignCardComponent {
      * Format currency value
      */
     private formatCurrency(amount: number): string {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD',
+        return new Intl.NumberFormat('fr-FR', {
             minimumFractionDigits: 0,
             maximumFractionDigits: 0
-        }).format(amount);
+        }).format(amount) + ' DT';
     }
 }

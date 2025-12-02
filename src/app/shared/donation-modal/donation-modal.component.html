@@ -14,28 +14,19 @@
                     <label>Select Amount</label>
                     <div class="amount-grid">
                         <button class="amount-btn" [class.active]="selectedAmount === 10"
-                            (click)="selectAmount(10)" [disabled]="state.isLoading">$10</button>
+                            (click)="selectAmount(10)" [disabled]="state.isLoading">10DT</button>
                         <button class="amount-btn" [class.active]="selectedAmount === 25"
-                            (click)="selectAmount(25)" [disabled]="state.isLoading">$25</button>
+                            (click)="selectAmount(25)" [disabled]="state.isLoading">25DT</button>
                         <button class="amount-btn" [class.active]="selectedAmount === 50"
-                            (click)="selectAmount(50)" [disabled]="state.isLoading">$50</button>
+                            (click)="selectAmount(50)" [disabled]="state.isLoading">50DT</button>
                         <button class="amount-btn" [class.active]="selectedAmount === 100"
-                            (click)="selectAmount(100)" [disabled]="state.isLoading">$100</button>
+                            (click)="selectAmount(100)" [disabled]="state.isLoading">100DT</button>
                     </div>
                     <div class="custom-amount">
-                        <span class="currency">$</span>
+                        <span class="currency">DT</span>
                         <input type="number" placeholder="Custom Amount" [(ngModel)]="customAmount"
                             (focus)="selectedAmount = 0" [disabled]="state.isLoading === true" min="1">
                     </div>
-                </div>
-
-                <div class="currency-selection">
-                    <label>Currency</label>
-                    <select [(ngModel)]="currency" [disabled]="state.isLoading === true">
-                        <option value="USD">USD ($)</option>
-                        <option value="EUR">EUR (€)</option>
-                        <option value="MAD">MAD (DH)</option>
-                    </select>
                 </div>
             </div>
         </div>

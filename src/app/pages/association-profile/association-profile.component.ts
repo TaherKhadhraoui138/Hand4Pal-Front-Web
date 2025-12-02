@@ -119,7 +119,7 @@ export class AssociationProfile implements OnInit, OnDestroy {
     return this.donationViewModel.getDonorName(donation);
   }
 
-  formatCurrency(amount: number, currency: string = 'USD'): string {
+  formatCurrency(amount: number, currency: string = 'DT'): string {
     return this.donationViewModel.formatCurrency(amount, currency);
   }
 
